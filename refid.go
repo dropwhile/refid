@@ -5,6 +5,7 @@ import (
 	"encoding/base32"
 	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -281,4 +282,16 @@ func (refId RefId) Format(f fmt.State, c rune) {
 		// invalid/unsupported format verb
 		fmt.Fprintf(f, "%%!%c(refid.RefId=%s)", c, refId.String())
 	}
+}
+
+func (refId RefId) MarshalJSON() ([]byte, error) {
+	return json.Marshal(refId.String())
+}
+
+func (refid *RefId) UnmarshalJSON(b []byte) error {
+	var s string
+	if err := json.Unmarshal(b, &s); err != nil {
+		return err
+	}
+	return refid.UnmarshalText([]byte(s))
 }

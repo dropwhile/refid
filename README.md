@@ -1,4 +1,10 @@
-# RefId
+RefId
+=====
+
+[![Build Status](https://github.com/dropwhile/refid/workflows/unit-tests/badge.svg)][1]
+[![GoDoc](https://godoc.org/github.com/dropwhile/refid?status.png)][2]
+[![Go Report Card](https://goreportcard.com/badge/dropwhile/refid)](https://goreportcard.com/report/dropwhile/refid)
+[![License](https://img.shields.io/github/license/dropwhile/refid.svg)](https://github.com/dropwhile/refid/blob/master/LICENSE.md)
 
 ```
  0                   1                   2                   3
@@ -19,6 +25,14 @@
 8 bytes random pad:
     fill with crypto/rand random
 ```
+
+## Inspirations
+
+*   https://github.com/gofrs/uuid  
+    gofrs' UUIDv7 might be a better option if you need something standard.
+*   https://github.com/uuid6/uuid6-ietf-draft,
+    https://github.com/ietf-wg-uuidrev/rfc4122bis  
+    UUIDv6/v7 drafts
 
 ## Features
 
@@ -154,3 +168,7 @@ tag value:    2
 time(string): 2023-01-01T00:00:11.123456Z
 time(micros): 1672531211123456
 ```
+
+[1]: https://github.com/dropwhile/refid/actions
+[2]: https://godoc.org/github.com/dropwile/refid
+[3]: https://choosealicense.com/licenses/mit/

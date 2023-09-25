@@ -2,6 +2,7 @@ package refid
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"testing"
@@ -122,4 +123,23 @@ func TestTemplateStringer(t *testing.T) {
 	err := tpl.Execute(&b, s)
 	assert.NilError(t, err)
 	assert.Equal(t, b.String(), testValWoutTag)
+}
+
+func TestJsonMarshal(t *testing.T) {
+	t.Parallel()
+
+	s := MustParse(testValWoutTag)
+	j, err := json.Marshal(s)
+	assert.NilError(t, err)
+	assert.Equal(t, string(j), fmt.Sprintf("%q", s.String()))
+}
+
+func TestJsonUnmarshal(t *testing.T) {
+	t.Parallel()
+
+	data := fmt.Sprintf("%q", testValWoutTag)
+	var refId RefId
+	err := json.Unmarshal([]byte(data), &refId)
+	assert.NilError(t, err)
+	assert.Equal(t, refId.String(), testValWoutTag)
 }

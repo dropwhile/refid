@@ -1,9 +1,33 @@
+// Original Work: Copyright (C) 2013-2018 by Maxim Bublis <b@codemonkey.ru>
+// Modifications: Copyright (C) 2023 Eli Janssen
+//
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+// ref: https://github.com/gofrs/uuid/blob/22c52c268bc0dcc0569793f5b1433db423f5a9c6/sql.go
+
 package refid
 
 import (
-	"bytes"
 	"database/sql"
 	"database/sql/driver"
+	"encoding/json"
 	"fmt"
 )
 
@@ -85,11 +109,7 @@ func (u NullRefId) MarshalJSON() ([]byte, error) {
 	if !u.Valid {
 		return nullJSON, nil
 	}
-	var buf bytes.Buffer
-	buf.WriteByte('"')
-	buf.WriteString(u.RefId.String())
-	buf.WriteByte('"')
-	return buf.Bytes(), nil
+	return json.Marshal(u.RefId.String())
 }
 
 // UnmarshalJSON unmarshals a NullRefId
@@ -98,10 +118,11 @@ func (u *NullRefId) UnmarshalJSON(b []byte) error {
 		u.RefId, u.Valid = Nil, false
 		return nil
 	}
-	if n := len(b); n >= 2 && b[0] == '"' {
-		b = b[1 : n-1]
+	var s string
+	if err := json.Unmarshal(b, &s); err != nil {
+		return err
 	}
-	err := u.RefId.UnmarshalText(b)
+	err := u.RefId.UnmarshalText([]byte(s))
 	u.Valid = (err == nil)
 	return err
 }
