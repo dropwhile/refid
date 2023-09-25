@@ -1,43 +1,43 @@
 package refid
 
-type RefIdTagger byte
+type Tagger byte
 
-func NewRefIdTagger(tagVal byte) RefIdTagger {
-	return RefIdTagger(tagVal)
+func NewTagger(tagVal byte) Tagger {
+	return Tagger(tagVal)
 }
 
-func (rt RefIdTagger) New() (RefId, error) {
-	return NewTagged(byte(rt))
+func (t Tagger) New() (RefId, error) {
+	return NewTagged(byte(t))
 }
 
-func (rt RefIdTagger) MustNew() RefId {
-	return MustNewTagged(byte(rt))
+func (t Tagger) MustNew() RefId {
+	return MustNewTagged(byte(t))
 }
 
-func (rt RefIdTagger) Parse(s string) (RefId, error) {
-	return ParseTagged(byte(rt), s)
+func (t Tagger) Parse(s string) (RefId, error) {
+	return ParseTagged(byte(t), s)
 }
 
-func (rt RefIdTagger) MustParse(s string) RefId {
-	return MustParseTagged(byte(rt), s)
+func (t Tagger) MustParse(s string) RefId {
+	return MustParseTagged(byte(t), s)
 }
 
-func (rt RefIdTagger) HasTag(r RefId, tag byte) bool {
+func (t Tagger) HasTag(r RefId, tag byte) bool {
 	return r.HasTag(tag)
 }
 
-func (rt RefIdTagger) IsTagged(r RefId) bool {
+func (t Tagger) IsTagged(r RefId) bool {
 	return r.IsTagged()
 }
 
-func (rt RefIdTagger) AnyMatcher() AnyMatcher {
-	return MatchAny(byte(rt))
+func (t Tagger) AnyMatcher() AnyMatcher {
+	return MatchAny(byte(t))
 }
 
-func (rt RefIdTagger) Tag() byte {
-	return byte(rt)
+func (t Tagger) Tag() byte {
+	return byte(t)
 }
 
-func (rt RefIdTagger) HasCorrectTag(r RefId) bool {
-	return r.HasTag(byte(rt))
+func (t Tagger) HasCorrectTag(r RefId) bool {
+	return r.HasTag(byte(t))
 }
