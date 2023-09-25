@@ -170,5 +170,5 @@ time(micros): 1672531211123456
 ```
 
 [1]: https://github.com/dropwhile/refid/actions
-[2]: https://godoc.org/github.com/dropwile/refid
+[2]: https://godoc.org/github.com/dropwhile/refid
 [3]: https://choosealicense.com/licenses/mit/
