@@ -10,15 +10,15 @@ func MatchAny(tag byte) AnyMatcher {
 
 // Match satisfies sqlmock.Argument interface
 func (a AnyMatcher) Match(v interface{}) bool {
-	var refId RefId
+	var r RefId
 	var err error
 	switch x := v.(type) {
 	case string:
-		refId, err = Parse(x)
+		r, err = Parse(x)
 	case []byte:
-		refId, err = FromBytes(x)
+		r, err = FromBytes(x)
 	case RefId:
-		refId = x
+		r = x
 	default:
 		return false
 	}
@@ -26,7 +26,7 @@ func (a AnyMatcher) Match(v interface{}) bool {
 		return false
 	}
 	if a.tag != 0 {
-		return refId.HasTag(a.tag)
+		return r.HasTag(a.tag)
 	}
 	return true
 }

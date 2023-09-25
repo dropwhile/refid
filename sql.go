@@ -37,24 +37,24 @@ var (
 )
 
 // Value implements the driver.Valuer interface.
-func (refId RefId) Value() (driver.Value, error) {
-	return refId.Bytes(), nil
+func (r RefId) Value() (driver.Value, error) {
+	return r.Bytes(), nil
 }
 
 // Scan implements the sql.Scanner interface.
 // A 16-byte slice will be handled by UnmarshalBinary, while
 // a longer byte slice or a string will be handled by UnmarshalText.
-func (refId *RefId) Scan(src interface{}) error {
+func (r *RefId) Scan(src interface{}) error {
 	switch src := src.(type) {
 	case RefId: // support gorm convert from RefId to NullRefId
-		*refId = src
+		*r = src
 		return nil
 
 	case []byte:
 		if len(src) == size {
-			return refId.UnmarshalBinary(src)
+			return r.UnmarshalBinary(src)
 		}
-		return refId.UnmarshalText(src)
+		return r.UnmarshalText(src)
 
 	case string:
 		var parseFunc func(string) (RefId, error)
@@ -69,7 +69,7 @@ func (refId *RefId) Scan(src interface{}) error {
 			return fmt.Errorf("refid: cannot convert %T to RefId", src)
 		}
 		uu, err := parseFunc(src)
-		*refId = uu
+		*r = uu
 		return err
 	}
 

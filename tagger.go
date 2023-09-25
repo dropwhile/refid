@@ -6,38 +6,38 @@ func NewRefIdTagger(tagVal byte) RefIdTagger {
 	return RefIdTagger(tagVal)
 }
 
-func (r RefIdTagger) New() (RefId, error) {
-	return NewTagged(byte(r))
+func (rt RefIdTagger) New() (RefId, error) {
+	return NewTagged(byte(rt))
 }
 
-func (r RefIdTagger) MustNew() RefId {
-	return MustNewTagged(byte(r))
+func (rt RefIdTagger) MustNew() RefId {
+	return MustNewTagged(byte(rt))
 }
 
-func (r RefIdTagger) Parse(s string) (RefId, error) {
-	return ParseTagged(byte(r), s)
+func (rt RefIdTagger) Parse(s string) (RefId, error) {
+	return ParseTagged(byte(rt), s)
 }
 
-func (r RefIdTagger) MustParse(s string) RefId {
-	return MustParseTagged(byte(r), s)
+func (rt RefIdTagger) MustParse(s string) RefId {
+	return MustParseTagged(byte(rt), s)
 }
 
-func (r RefIdTagger) HasTag(refId RefId, tag byte) bool {
-	return refId.HasTag(tag)
+func (rt RefIdTagger) HasTag(r RefId, tag byte) bool {
+	return r.HasTag(tag)
 }
 
-func (r RefIdTagger) IsTagged(refId RefId) bool {
-	return refId.IsTagged()
+func (rt RefIdTagger) IsTagged(r RefId) bool {
+	return r.IsTagged()
 }
 
-func (r RefIdTagger) AnyMatcher() AnyMatcher {
-	return MatchAny(byte(r))
+func (rt RefIdTagger) AnyMatcher() AnyMatcher {
+	return MatchAny(byte(rt))
 }
 
-func (r RefIdTagger) Tag() byte {
-	return byte(r)
+func (rt RefIdTagger) Tag() byte {
+	return byte(rt)
 }
 
-func (r RefIdTagger) HasCorrectTag(refId RefId) bool {
-	return refId.HasTag(byte(r))
+func (rt RefIdTagger) HasCorrectTag(r RefId) bool {
+	return r.HasTag(byte(rt))
 }

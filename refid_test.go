@@ -22,13 +22,13 @@ func TestGetTime(t *testing.T) {
 
 	// divide times by 10, so we are close enough
 	t0 := time.Now().UTC().Unix() / 10
-	refId := MustNew()
-	vz := refId.Time().UTC().Unix() / 10
+	r := MustNew()
+	vz := r.Time().UTC().Unix() / 10
 	assert.Equal(t, t0, vz)
 
-	refId2 := MustParse(testValWoutTag)
+	r2 := MustParse(testValWoutTag)
 	ts, _ := time.Parse(time.RFC3339, "2023-09-14T18:29:43.493733Z")
-	assert.Equal(t, ts.UTC(), refId2.Time().UTC())
+	assert.Equal(t, ts.UTC(), r2.Time().UTC())
 }
 
 func TestSetTime(t *testing.T) {
@@ -36,29 +36,29 @@ func TestSetTime(t *testing.T) {
 
 	ts, _ := time.Parse(time.RFC3339, "2023-01-14T18:29:00Z")
 
-	refId := MustNew()
-	refId.SetTime(ts)
-	assert.Equal(t, ts.UTC(), refId.Time().UTC())
+	r := MustNew()
+	r.SetTime(ts)
+	assert.Equal(t, ts.UTC(), r.Time().UTC())
 }
 
 func TestBase64RoundTrip(t *testing.T) {
 	t.Parallel()
 
-	refId := MustParse(testValWithTag)
-	b64 := refId.ToBase64String()
-	refId2, err := FromBase64String(b64)
+	r := MustParse(testValWithTag)
+	b64 := r.ToBase64String()
+	r2, err := FromBase64String(b64)
 	assert.NilError(t, err)
-	assert.Equal(t, refId.String(), refId2.String())
+	assert.Equal(t, r.String(), r2.String())
 }
 
 func TestHexRoundTrip(t *testing.T) {
 	t.Parallel()
 
-	refId := MustParse(testValWithTag)
-	b64 := refId.ToHexString()
-	refId2, err := FromHexString(b64)
+	r := MustParse(testValWithTag)
+	b64 := r.ToHexString()
+	r2, err := FromHexString(b64)
 	assert.NilError(t, err)
-	assert.Equal(t, refId.String(), refId2.String())
+	assert.Equal(t, r.String(), r2.String())
 }
 
 func TestRoundTrip(t *testing.T) {
@@ -79,28 +79,28 @@ func TestRoundTrip(t *testing.T) {
 func TestSetTag(t *testing.T) {
 	t.Parallel()
 
-	refId := MustParse(testValWoutTag)
-	assert.Check(t, !refId.HasTag(refTagTest))
-	assert.Equal(t, refId.String(), testValWoutTag)
-	assert.Equal(t, (&refId).String(), testValWoutTag)
+	r := MustParse(testValWoutTag)
+	assert.Check(t, !r.HasTag(refTagTest))
+	assert.Equal(t, r.String(), testValWoutTag)
+	assert.Equal(t, (&r).String(), testValWoutTag)
 
-	refId.SetTag(refTagTest)
-	assert.Check(t, refId.HasTag(refTagTest))
-	assert.Equal(t, refId.String(), testValWithTag)
-	assert.Equal(t, (&refId).String(), testValWithTag)
+	r.SetTag(refTagTest)
+	assert.Check(t, r.HasTag(refTagTest))
+	assert.Equal(t, r.String(), testValWithTag)
+	assert.Equal(t, (&r).String(), testValWithTag)
 
-	refId.ClearTag()
-	assert.Check(t, !refId.HasTag(refTagTest))
-	assert.Equal(t, refId.String(), testValWoutTag)
-	assert.Equal(t, (&refId).String(), testValWoutTag)
+	r.ClearTag()
+	assert.Check(t, !r.HasTag(refTagTest))
+	assert.Equal(t, r.String(), testValWoutTag)
+	assert.Equal(t, (&r).String(), testValWoutTag)
 
-	refId3 := MustParse(testValWoutTag)
-	refId3.SetTag(1)
-	assert.Equal(t, refId3.ToHexString(), "060555dc1cbc6501a0c131f40831a187")
-	refId3.ClearTag()
-	assert.Equal(t, refId3.ToHexString(), "060555dc1cbc6500a0c131f40831a187")
-	refId3.SetTag(2)
-	assert.Equal(t, refId3.ToHexString(), "060555dc1cbc6502a0c131f40831a187")
+	r2 := MustParse(testValWoutTag)
+	r2.SetTag(1)
+	assert.Equal(t, r2.ToHexString(), "060555dc1cbc6501a0c131f40831a187")
+	r2.ClearTag()
+	assert.Equal(t, r2.ToHexString(), "060555dc1cbc6500a0c131f40831a187")
+	r2.SetTag(2)
+	assert.Equal(t, r2.ToHexString(), "060555dc1cbc6502a0c131f40831a187")
 }
 
 func TestAmbiguous(t *testing.T) {
@@ -138,8 +138,8 @@ func TestJsonUnmarshal(t *testing.T) {
 	t.Parallel()
 
 	data := fmt.Sprintf("%q", testValWoutTag)
-	var refId RefId
-	err := json.Unmarshal([]byte(data), &refId)
+	var r RefId
+	err := json.Unmarshal([]byte(data), &r)
 	assert.NilError(t, err)
-	assert.Equal(t, refId.String(), testValWoutTag)
+	assert.Equal(t, r.String(), testValWoutTag)
 }

@@ -29,82 +29,82 @@ const (
 type RefId [size]byte
 
 func New() (RefId, error) {
-	var refId RefId
+	var r RefId
 	b, err := generate()
 	if err != nil {
-		return refId, err
+		return r, err
 	}
-	copy(refId[:], b[:])
-	return refId, nil
+	copy(r[:], b[:])
+	return r, nil
 }
 
 func MustNew() RefId {
-	refId, err := New()
+	r, err := New()
 	if err != nil {
 		panic(err)
 	}
-	return refId
+	return r
 }
 
 func NewTagged(tag byte) (RefId, error) {
-	refId, err := New()
+	r, err := New()
 	if err != nil {
-		return refId, err
+		return r, err
 	}
-	refId.SetTag(tag)
-	return refId, nil
+	r.SetTag(tag)
+	return r, nil
 }
 
 func MustNewTagged(tag byte) RefId {
-	refId := MustNew()
-	refId.SetTag(tag)
-	return refId
+	r := MustNew()
+	r.SetTag(tag)
+	return r
 }
 
 func Parse(s string) (RefId, error) {
-	var refId RefId
-	err := refId.UnmarshalText([]byte(s))
+	var r RefId
+	err := r.UnmarshalText([]byte(s))
 	if err != nil {
-		return refId, err
+		return r, err
 	}
-	return refId, nil
+	return r, nil
 }
 
 func MustParse(s string) RefId {
-	refId, err := Parse(s)
+	r, err := Parse(s)
 	if err != nil {
 		panic(`RefId: Parse(` + s + `): ` + err.Error())
 	}
-	return refId
+	return r
 }
 
 func ParseTagged(tag byte, s string) (RefId, error) {
-	refId, err := Parse(s)
+	r, err := Parse(s)
 	if err != nil {
-		return refId, err
+		return r, err
 	}
 
-	if !refId.HasTag(tag) {
-		return refId, fmt.Errorf("RefId tag mismatch: %d != %d", refId[tagIndex], tag)
+	if !r.HasTag(tag) {
+		return r, fmt.Errorf("RefId tag mismatch: %d != %d", r[tagIndex], tag)
 	}
-	return refId, nil
+	return r, nil
 }
 
 func MustParseTagged(tag byte, s string) RefId {
-	refId, err := ParseTagged(tag, s)
+	r, err := ParseTagged(tag, s)
 	if err != nil {
 		panic(`RefId: ExpectParse(` + s + `): ` + "RefId tag mismatch")
 	}
-	return refId
+	return r
 }
 
 func FromBytes(input []byte) (RefId, error) {
-	var refId RefId
-	err := refId.UnmarshalBinary(input)
+	var r RefId
+	err := r.UnmarshalBinary(input)
 	if err != nil {
-		return refId, err
+		return r, err
 	}
-	return refId, nil
+	return r, nil
 }
 
 func FromString(s string) (RefId, error) {
@@ -112,72 +112,72 @@ func FromString(s string) (RefId, error) {
 }
 
 func FromBase64String(input string) (RefId, error) {
-	var refId RefId
+	var r RefId
 	bx, err := base64.RawURLEncoding.DecodeString(input)
 	if err != nil {
-		return refId, err
+		return r, err
 	}
 	if len(bx) != size {
-		return refId, fmt.Errorf("wrong unmarshal size")
+		return r, fmt.Errorf("wrong unmarshal size")
 	}
-	copy(refId[:], bx[:])
-	return refId, nil
+	copy(r[:], bx[:])
+	return r, nil
 }
 
 func FromHexString(input string) (RefId, error) {
-	var refId RefId
+	var r RefId
 	bx, err := hex.DecodeString(input)
 	if err != nil {
-		return refId, err
+		return r, err
 	}
 	if len(bx) != size {
-		return refId, fmt.Errorf("wrong unmarshal size")
+		return r, fmt.Errorf("wrong unmarshal size")
 	}
-	copy(refId[:], bx[:])
-	return refId, nil
+	copy(r[:], bx[:])
+	return r, nil
 }
 
-func (refId *RefId) SetTime(ts time.Time) *RefId {
-	setTime(refId[:], ts.UTC().UnixMicro())
-	return refId
+func (r *RefId) SetTime(ts time.Time) *RefId {
+	setTime(r[:], ts.UTC().UnixMicro())
+	return r
 }
 
-func (refId *RefId) SetTag(tag byte) *RefId {
-	refId[tagIndex] = tag
-	return refId
+func (r *RefId) SetTag(tag byte) *RefId {
+	r[tagIndex] = tag
+	return r
 }
 
-func (refId *RefId) ClearTag() *RefId {
-	refId[tagIndex] = 0
-	return refId
+func (r *RefId) ClearTag() *RefId {
+	r[tagIndex] = 0
+	return r
 }
 
-func (refId RefId) IsTagged() bool {
-	return refId[tagIndex] != 0
+func (r RefId) IsTagged() bool {
+	return r[tagIndex] != 0
 }
 
-func (refId RefId) HasTag(tag byte) bool {
-	return (refId.IsTagged() && refId[tagIndex] == tag)
+func (r RefId) HasTag(tag byte) bool {
+	return (r.IsTagged() && r[tagIndex] == tag)
 }
 
-func (refId RefId) Tag() byte {
-	return refId[tagIndex]
+func (r RefId) Tag() byte {
+	return r[tagIndex]
 }
 
-func (refId RefId) IsNil() bool {
-	return refId == Nil
+func (r RefId) IsNil() bool {
+	return r == Nil
 }
 
-func (refId RefId) Equal(other RefId) bool {
-	return refId.String() == other.String()
+func (r RefId) Equal(other RefId) bool {
+	return r.String() == other.String()
 }
 
-func (refId RefId) MarshalText() ([]byte, error) {
-	return []byte(refId.String()), nil
+func (r RefId) MarshalText() ([]byte, error) {
+	return []byte(r.String()), nil
 }
 
-func (refId RefId) Time() time.Time {
-	u := refId[timeStart:]
+func (r RefId) Time() time.Time {
+	u := r[timeStart:]
 	t := 0 |
 		(int64(u[0]) << 48) |
 		(int64(u[1]) << 40) |
@@ -189,7 +189,7 @@ func (refId RefId) Time() time.Time {
 	return time.UnixMicro(t).UTC()
 }
 
-func (refId *RefId) UnmarshalText(b []byte) error {
+func (r *RefId) UnmarshalText(b []byte) error {
 	decLen := WordSafeEncoding.DecodedLen(len(b))
 	if decLen != size {
 		return fmt.Errorf("refid: RefId must be exactly %d bytes long, got %d bytes", size, decLen)
@@ -213,85 +213,85 @@ func (refId *RefId) UnmarshalText(b []byte) error {
 	if n != size {
 		return fmt.Errorf("wrong unmarshal size")
 	}
-	copy(refId[:], bx[:])
+	copy(r[:], bx[:])
 	return nil
 }
 
-func (refId RefId) Bytes() []byte {
+func (r RefId) Bytes() []byte {
 	b := make([]byte, size)
-	copy(b[:], refId[:])
+	copy(b[:], r[:])
 	return b
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface.
-func (refId RefId) MarshalBinary() ([]byte, error) {
-	return refId.Bytes(), nil
+func (r RefId) MarshalBinary() ([]byte, error) {
+	return r.Bytes(), nil
 }
 
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
 // It will return an error if the slice isn't of appropriate size.
-func (refId *RefId) UnmarshalBinary(data []byte) error {
+func (r *RefId) UnmarshalBinary(data []byte) error {
 	dlen := len(data)
 	if dlen != size {
 		return fmt.Errorf("refid: RefId must be exactly %d bytes long, got %d bytes", size, dlen)
 	}
-	copy(refId[:], data[:])
+	copy(r[:], data[:])
 	return nil
 }
 
-func (refId RefId) String() string {
-	return WordSafeEncoding.EncodeToString(refId[:])
+func (r RefId) String() string {
+	return WordSafeEncoding.EncodeToString(r[:])
 }
 
-func (refId RefId) ToString() string {
-	return refId.String()
+func (r RefId) ToString() string {
+	return r.String()
 }
 
-func (refId RefId) ToBase64String() string {
-	return base64.RawURLEncoding.EncodeToString(refId[:])
+func (r RefId) ToBase64String() string {
+	return base64.RawURLEncoding.EncodeToString(r[:])
 }
 
-func (refId RefId) ToHexString() string {
-	return hex.EncodeToString(refId[:])
+func (r RefId) ToHexString() string {
+	return hex.EncodeToString(r[:])
 }
 
-func (refId RefId) Format(f fmt.State, c rune) {
+func (r RefId) Format(f fmt.State, c rune) {
 	if c == 'v' && f.Flag('#') {
-		fmt.Fprintf(f, "%#v", refId.Bytes())
+		fmt.Fprintf(f, "%#v", r.Bytes())
 		return
 	}
 	switch c {
 	case 'x', 'X':
 		b := make([]byte, size*2)
-		hex.Encode(b, refId.Bytes())
+		hex.Encode(b, r.Bytes())
 		if c == 'X' {
 			bytes.ToUpper(b)
 		}
 		_, _ = f.Write(b)
 	case 'v', 's', 'S':
-		b, _ := refId.MarshalText()
+		b, _ := r.MarshalText()
 		if c == 'S' {
 			bytes.ToUpper(b)
 		}
 		_, _ = f.Write(b)
 	case 'q':
 		_, _ = f.Write([]byte{'"'})
-		_, _ = f.Write(refId.Bytes())
+		_, _ = f.Write(r.Bytes())
 		_, _ = f.Write([]byte{'"'})
 	default:
 		// invalid/unsupported format verb
-		fmt.Fprintf(f, "%%!%c(refid.RefId=%s)", c, refId.String())
+		fmt.Fprintf(f, "%%!%c(refid.RefId=%s)", c, r.String())
 	}
 }
 
-func (refId RefId) MarshalJSON() ([]byte, error) {
-	return json.Marshal(refId.String())
+func (r RefId) MarshalJSON() ([]byte, error) {
+	return json.Marshal(r.String())
 }
 
-func (refid *RefId) UnmarshalJSON(b []byte) error {
+func (r *RefId) UnmarshalJSON(b []byte) error {
 	var s string
 	if err := json.Unmarshal(b, &s); err != nil {
 		return err
 	}
-	return refid.UnmarshalText([]byte(s))
+	return r.UnmarshalText([]byte(s))
 }
