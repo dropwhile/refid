@@ -1,13 +1,15 @@
 package refid
 
-// A matcher that supports the pgxmock.Argument interface
+// A matcher that supports the following interfaces:
+//   - [github.com/pashagolub/pgxmock.Argument]
+//   - [github.com/DATA-DOG/go-sqlmock.Argument]
 type AnyMatcher struct {
 	tag byte
 }
 
-// Create a AnyMatcher matcher that supports the pgxmock.Argument interface,
-// and matches against a specific Tag. Any valid RefIds that do not
-// match the tag specified, will be considered not matching.
+// Create a [AnyMatcher] matcher that matches that matches against a specific
+// Tag. Any valid RefIds that do not match the tag specified, will be considered
+// not matching.
 //
 // If tag is 0, will support matching any RefId (tag is then ignored)
 //
@@ -20,7 +22,6 @@ func MatchAny(tag byte) AnyMatcher {
 	return AnyMatcher{tag}
 }
 
-// Match satisfies sqlmock.Argument interface
 func (a AnyMatcher) Match(v interface{}) bool {
 	var r RefId
 	var err error

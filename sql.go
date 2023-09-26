@@ -36,14 +36,14 @@ var (
 	_ sql.Scanner   = (*RefId)(nil)
 )
 
-// Value implements the driver.Valuer interface.
+// Value implements the [sql/driver.Valuer] interface.
 func (r RefId) Value() (driver.Value, error) {
 	return r.Bytes(), nil
 }
 
-// Scan implements the sql.Scanner interface.
-// A 16-byte slice will be handled by UnmarshalBinary, while
-// a longer byte slice or a string will be handled by UnmarshalText.
+// Scan implements the [sql.Scanner] interface.
+// A 16-byte slice will be handled by [UnmarshalBinary], while
+// a longer byte slice or a string will be handled by [UnmarshalText].
 func (r *RefId) Scan(src interface{}) error {
 	switch src := src.(type) {
 	case RefId: // support gorm convert from RefId to NullRefId
@@ -77,13 +77,13 @@ func (r *RefId) Scan(src interface{}) error {
 }
 
 // NullRefId can be used with the standard sql package to represent a
-// RefId value that can be NULL in the database.
+// [RefId] value that can be NULL in the database.
 type NullRefId struct {
 	RefId RefId
 	Valid bool
 }
 
-// Value implements the driver.Valuer interface.
+// Value implements the [sql/driver.Valuer] interface.
 func (u NullRefId) Value() (driver.Value, error) {
 	if !u.Valid {
 		return nil, nil
@@ -91,7 +91,7 @@ func (u NullRefId) Value() (driver.Value, error) {
 	return u.RefId.Value()
 }
 
-// Scan implements the sql.Scanner interface.
+// Scan implements the [sql.Scanner] interface.
 func (u *NullRefId) Scan(src interface{}) error {
 	if src == nil {
 		u.RefId, u.Valid = Nil, false
@@ -104,7 +104,7 @@ func (u *NullRefId) Scan(src interface{}) error {
 
 var nullJSON = []byte("null")
 
-// MarshalJSON marshals the NullRefId as null or the nested RefId
+// MarshalJSON marshals the [NullRefId] as null or the nested [RefId]
 func (u NullRefId) MarshalJSON() ([]byte, error) {
 	if !u.Valid {
 		return nullJSON, nil
@@ -112,7 +112,7 @@ func (u NullRefId) MarshalJSON() ([]byte, error) {
 	return json.Marshal(u.RefId.String())
 }
 
-// UnmarshalJSON unmarshals a NullRefId
+// UnmarshalJSON unmarshals a [NullRefId]
 func (u *NullRefId) UnmarshalJSON(b []byte) error {
 	if string(b) == "null" {
 		u.RefId, u.Valid = Nil, false

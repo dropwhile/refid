@@ -44,7 +44,7 @@ const (
 //     not an rfc standard
 type RefId [size]byte
 
-// New returns a new RefId.
+// New returns a new [RefId].
 //
 // If random bytes cannot be generated, it will return an error.
 func New() (RefId, error) {
@@ -57,7 +57,7 @@ func New() (RefId, error) {
 	return r, nil
 }
 
-// NewTagged returns a RefId tagged with tag.
+// NewTagged returns a [RefId] tagged with tag.
 //
 // If random bytes cannot be generated, it will return an error.
 func NewTagged(tag byte) (RefId, error) {
@@ -70,7 +70,7 @@ func NewTagged(tag byte) (RefId, error) {
 }
 
 // Parse parses a textual RefId representation, and returns
-// a RefId. Supports parsing the following text formats:
+// a [RefId]. Supports parsing the following text formats:
 // * native - base32 (Crockford's alphabet)
 // * base64
 // * base16/hex
@@ -93,8 +93,9 @@ func Parse(s string) (RefId, error) {
 }
 
 // ParseTagged parses a textual RefId representation
-// (same formats as Parse) while additionally requiring
-// the parsed RefId to be tagged with tag.
+// (same formats as Parse),while additionally requiring
+// the parsed RefId to be tagged with tag, and returns
+// a [RefId].
 //
 // Returns an error if RefId fails to parse or if RefId
 // is not tagged with tag.
@@ -110,7 +111,7 @@ func ParseTagged(tag byte, s string) (RefId, error) {
 	return r, nil
 }
 
-// FromBytes creates a new RefId from a byte slice.
+// FromBytes creates a new [RefId] from a byte slice.
 // Returns an error if the slice does not have a length of 16.
 // The bytes are copied from the slice.
 func FromBytes(input []byte) (RefId, error) {
@@ -122,13 +123,13 @@ func FromBytes(input []byte) (RefId, error) {
 	return r, nil
 }
 
-// FromString is an alias of Parse.
+// FromString is an alias of [Parse].
 func FromString(s string) (RefId, error) {
 	return Parse(s)
 }
 
 // FromBase64String parses a base64 string and returns
-// a RefId.
+// a [RefId].
 // Returns an error if the base64 string is of improper size
 // or otherwise fails to parse.
 func FromBase64String(input string) (RefId, error) {
@@ -145,7 +146,7 @@ func FromBase64String(input string) (RefId, error) {
 }
 
 // FromHexString parses a base16/hex string and returns
-// a RefId.
+// a [RefId].
 // Returns an error if the base16/hex string is of improper size
 // or otherwise fails to parse.
 func FromHexString(input string) (RefId, error) {
@@ -168,7 +169,7 @@ func (r *RefId) SetTime(ts time.Time) *RefId {
 	return r
 }
 
-// Time returns the timestamp portion of a RefId as a time.Time
+// Time returns the timestamp portion of a [RefId] as a [time.Time]
 func (r RefId) Time() time.Time {
 	u := r[timeStart:]
 	t := 0 |
@@ -182,47 +183,47 @@ func (r RefId) Time() time.Time {
 	return time.UnixMicro(t).UTC()
 }
 
-// SetTag sets the RefId tag to the specified value.
+// SetTag sets the [RefId] tag to the specified value.
 func (r *RefId) SetTag(tag byte) *RefId {
 	r[tagIndex] = tag
 	return r
 }
 
-// ClearTag clears the RefId tag.
+// ClearTag clears the [RefId] tag.
 func (r *RefId) ClearTag() *RefId {
 	r[tagIndex] = 0
 	return r
 }
 
-// IsTagged reports whether the RefId is tagged.
+// IsTagged reports whether the [RefId] is tagged.
 func (r RefId) IsTagged() bool {
 	return r[tagIndex] != 0
 }
 
-// IsTagged reports whether the RefId is tagged and
+// IsTagged reports whether the [RefId] is tagged and
 // if so, if it is tagged with tag.
 func (r RefId) HasTag(tag byte) bool {
 	return (r.IsTagged() && r[tagIndex] == tag)
 }
 
 // Tag returns the current tag of the RefId.
-// If the RefId is untagged, it will retrun 0.
+// If the [RefId] is untagged, it will retrun 0.
 func (r RefId) Tag() byte {
 	return r[tagIndex]
 }
 
-// IsNil reports if the RefId is the nil value RefId.
+// IsNil reports if the [RefId] is the nil value RefId.
 func (r RefId) IsNil() bool {
 	return r == Nil
 }
 
-// Equal compares a RefId to another RefId to see
+// Equal compares a [RefId] to another RefId to see
 // if they have the same underlying bytes.
 func (r RefId) Equal(other RefId) bool {
 	return r.String() == other.String()
 }
 
-// Bytes returns a slice of a copy of the current RefId underlying data.
+// Bytes returns a slice of a copy of the current [RefId] underlying data.
 func (r RefId) Bytes() []byte {
 	b := make([]byte, size)
 	copy(b[:], r[:])
@@ -230,27 +231,27 @@ func (r RefId) Bytes() []byte {
 }
 
 // String returns the native (base32 w/Crockford alphabet) textual represenation
-// of a RefId
+// of a [RefId]
 func (r RefId) String() string {
 	return base32Encoder.EncodeToString(r[:])
 }
 
-// ToString is an alias of String
+// ToString is an alias of [String]
 func (r RefId) ToString() string {
 	return r.String()
 }
 
-// String returns the base64 textual represenation of a RefId
+// String returns the base64 textual represenation of a [RefId]
 func (r RefId) ToBase64String() string {
 	return base64.RawURLEncoding.EncodeToString(r[:])
 }
 
-// String returns the base16/hex textual represenation of a RefId
+// String returns the base16/hex textual represenation of a [RefId]
 func (r RefId) ToHexString() string {
 	return hex.EncodeToString(r[:])
 }
 
-// Format implements the fmt.Formatter interface.
+// Format implements the [fmt.Formatter] interface.
 func (r RefId) Format(f fmt.State, c rune) {
 	if c == 'v' && f.Flag('#') {
 		fmt.Fprintf(f, "%#v", r.Bytes())
@@ -280,12 +281,12 @@ func (r RefId) Format(f fmt.State, c rune) {
 	}
 }
 
-// MarshalText implements the encoding.TextMarshaler interface.
+// MarshalText implements the [encoding.TextMarshaler] interface.
 func (r RefId) MarshalText() ([]byte, error) {
 	return []byte(r.String()), nil
 }
 
-// UnmarshalText implements the encoding.TextUnmarshaler interface.
+// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 // It will return an error if the slice isn't of appropriate size.
 func (r *RefId) UnmarshalText(b []byte) error {
 	decLen := base32Encoder.DecodedLen(len(b))
@@ -315,12 +316,12 @@ func (r *RefId) UnmarshalText(b []byte) error {
 	return nil
 }
 
-// MarshalBinary implements the encoding.BinaryMarshaler interface.
+// MarshalBinary implements the [encoding.BinaryMarshaler] interface.
 func (r RefId) MarshalBinary() ([]byte, error) {
 	return r.Bytes(), nil
 }
 
-// UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
+// UnmarshalBinary implements the [encoding.BinaryUnmarshaler] interface.
 // It will return an error if the slice isn't of appropriate size.
 func (r *RefId) UnmarshalBinary(data []byte) error {
 	dlen := len(data)
@@ -331,12 +332,12 @@ func (r *RefId) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-// MarshalJson implements the json.Marshaler interface.
+// MarshalJson implements the [json.Marshaler] interface.
 func (r RefId) MarshalJSON() ([]byte, error) {
 	return json.Marshal(r.String())
 }
 
-// UnmarshalJson implements the json.Unmarshaler interface.
+// UnmarshalJson implements the [json.Unmarshaler] interface.
 func (r *RefId) UnmarshalJSON(b []byte) error {
 	var s string
 	if err := json.Unmarshal(b, &s); err != nil {
