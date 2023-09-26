@@ -33,7 +33,7 @@ import (
 )
 
 var (
-	codecTestRefId = MustParse("0r32b0yermw00sbjedjxe4yaz0")
+	codecTestRefId = Must(Parse("0r32b0yermw00sbjedjxe4yaz0"))
 	codecTestData  = codecTestRefId.Bytes()
 )
 

@@ -41,11 +41,11 @@ func TestGetTime(t *testing.T) {
 
 	// divide times by 10, so we are close enough
 	t0 := time.Now().UTC().Unix() / 10
-	r := MustNew()
+	r := Must(New())
 	vz := r.Time().UTC().Unix() / 10
 	assert.Equal(t, t0, vz)
 
-	r2 := MustParse(testValWoutTag)
+	r2 := Must(Parse(testValWoutTag))
 	ts, _ := time.Parse(time.RFC3339, "2023-09-14T18:29:43.493733Z")
 	assert.Equal(t, ts.UTC(), r2.Time().UTC())
 }
@@ -55,7 +55,7 @@ func TestSetTime(t *testing.T) {
 
 	ts, _ := time.Parse(time.RFC3339, "2023-01-14T18:29:00Z")
 
-	r := MustNew()
+	r := Must(New())
 	r.SetTime(ts)
 	assert.Equal(t, ts.UTC(), r.Time().UTC())
 }
@@ -63,7 +63,7 @@ func TestSetTime(t *testing.T) {
 func TestBase64RoundTrip(t *testing.T) {
 	t.Parallel()
 
-	r := MustParse(testValWithTag)
+	r := Must(Parse(testValWithTag))
 	b64 := r.ToBase64String()
 	r2, err := FromBase64String(b64)
 	assert.NilError(t, err)
@@ -73,7 +73,7 @@ func TestBase64RoundTrip(t *testing.T) {
 func TestHexRoundTrip(t *testing.T) {
 	t.Parallel()
 
-	r := MustParse(testValWithTag)
+	r := Must(Parse(testValWithTag))
 	b64 := r.ToHexString()
 	r2, err := FromHexString(b64)
 	assert.NilError(t, err)
@@ -82,14 +82,14 @@ func TestHexRoundTrip(t *testing.T) {
 
 func TestRoundTrip(t *testing.T) {
 	t.Parallel()
-	u := MustNew()
-	r := MustParse(u.String())
+	u := Must(New())
+	r := Must(Parse(u.String()))
 	assert.Check(t, !u.HasTag(refTagTest))
 	assert.Check(t, !r.HasTag(refTagTest))
 	assert.Equal(t, u.String(), r.String())
 
-	u = MustNewTagged(refTagTest)
-	r = MustParse(u.String())
+	u = Must(NewTagged(refTagTest))
+	r = Must(Parse(u.String()))
 	assert.Check(t, u.HasTag(refTagTest))
 	assert.Check(t, r.HasTag(refTagTest))
 	assert.Equal(t, u.String(), r.String())
@@ -98,7 +98,7 @@ func TestRoundTrip(t *testing.T) {
 func TestSetTag(t *testing.T) {
 	t.Parallel()
 
-	r := MustParse(testValWoutTag)
+	r := Must(Parse(testValWoutTag))
 	assert.Check(t, !r.HasTag(refTagTest))
 	assert.Equal(t, r.String(), testValWoutTag)
 	assert.Equal(t, (&r).String(), testValWoutTag)
@@ -113,7 +113,7 @@ func TestSetTag(t *testing.T) {
 	assert.Equal(t, r.String(), testValWoutTag)
 	assert.Equal(t, (&r).String(), testValWoutTag)
 
-	r2 := MustParse(testValWoutTag)
+	r2 := Must(Parse(testValWoutTag))
 	r2.SetTag(1)
 	assert.Equal(t, r2.ToHexString(), "060555dc1cbc6501a0c131f40831a187")
 	r2.ClearTag()
@@ -125,9 +125,9 @@ func TestSetTag(t *testing.T) {
 func TestAmbiguous(t *testing.T) {
 	t.Parallel()
 
-	rd0 := MustParse(testValWoutTag)
-	rd1 := MustParse(testValWoutTag)
-	rd2 := MustParse(testValWoutTag)
+	rd0 := Must(Parse(testValWoutTag))
+	rd1 := Must(Parse(testValWoutTag))
+	rd2 := Must(Parse(testValWoutTag))
 	assert.Assert(t,
 		rd0.String() == rd1.String() && rd1.String() == rd2.String(),
 	)
@@ -135,7 +135,7 @@ func TestAmbiguous(t *testing.T) {
 
 func TestTemplateStringer(t *testing.T) {
 	t.Parallel()
-	s := MustParse(testValWoutTag)
+	s := Must(Parse(testValWoutTag))
 	assert.Equal(t, fmt.Sprintf("%s", s), testValWoutTag)
 	tpl := template.Must(template.New("name").Parse(`{{.}}`))
 	var b bytes.Buffer
@@ -147,7 +147,7 @@ func TestTemplateStringer(t *testing.T) {
 func TestJsonMarshal(t *testing.T) {
 	t.Parallel()
 
-	s := MustParse(testValWoutTag)
+	s := Must(Parse(testValWoutTag))
 	j, err := json.Marshal(s)
 	assert.NilError(t, err)
 	assert.Equal(t, string(j), fmt.Sprintf("%q", s.String()))

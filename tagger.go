@@ -10,16 +10,8 @@ func (t Tagger) New() (RefId, error) {
 	return NewTagged(byte(t))
 }
 
-func (t Tagger) MustNew() RefId {
-	return MustNewTagged(byte(t))
-}
-
 func (t Tagger) Parse(s string) (RefId, error) {
 	return ParseTagged(byte(t), s)
-}
-
-func (t Tagger) MustParse(s string) RefId {
-	return MustParseTagged(byte(t), s)
 }
 
 func (t Tagger) HasTag(r RefId, tag byte) bool {

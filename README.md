@@ -65,7 +65,7 @@ go get -u github.com/dropwhile/refid
 // generate refid
 refId, err := refid.New()
 // generate refid (or panic)
-refId = refid.MustNew()
+refId = refid.Must(refid.New())
 
 // encoding...
 // encode to native encoding (base32 with Crockford alphabet)
@@ -96,7 +96,7 @@ Simple tagging usage:
 myTag := 2
 
 // generate a refId with tag set to 1
-refId = refid.MustNewTagged(1)
+refId = refid.Must(refid.NewTagged(1))
 // you can also set it manually after generation
 refId.SetTag(myTag)
 // check if it is tagged
@@ -127,9 +127,9 @@ AuthorRefIdT := refid.RefIdTagger(2)
 // BookRefId ensures it will only succesfully generate and parse tag=3 refids
 BookRefIdT := refid.RefIdTagger(3)
 
-authorRefId := AuthorRefIdT.MustNew() // generated with a tag of 2
+authorRefId := refid.Must(AuthorRefIdT.New()) // generated with a tag of 2
 authorRefId.HasTag(2) // true
-bookRefId := BookRefIdT.MustNew() // generated with a tag of 3
+bookRefId := refid.Must(BookRefIdT.New()) // generated with a tag of 3
 bookRefId.HasTag(3) // true
 
 r, err := AuthorRefIdT.Parse(authorRefId.String()) // succeeds; err == nil

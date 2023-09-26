@@ -29,9 +29,9 @@ var generateCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		var refId refid.RefId
 		if TagValue != 0 {
-			refId = refid.MustNewTagged(TagValue)
+			refId = refid.Must(refid.NewTagged(TagValue))
 		} else {
-			refId = refid.MustNew()
+			refId = refid.Must(refid.New())
 		}
 
 		var ts time.Time
