@@ -6,6 +6,10 @@ RefId
 [![Go Report Card](https://goreportcard.com/badge/dropwhile/refid)](https://goreportcard.com/report/dropwhile/refid)
 [![License](https://img.shields.io/github/license/dropwhile/refid.svg)](https://github.com/dropwhile/refid/blob/master/LICENSE.md)
 
+## About
+
+A RefId is a sortable unique identifier, similar to UUIDv7, with a few difference.
+
 ```
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -26,14 +30,6 @@ RefId
     fill with crypto/rand random
 ```
 
-## Inspirations
-
-*   https://github.com/gofrs/uuid  
-    gofrs' UUIDv7 might be a better option if you need something standard.
-*   https://github.com/uuid6/uuid6-ietf-draft,
-    https://github.com/ietf-wg-uuidrev/rfc4122bis  
-    UUIDv6/v7 drafts
-
 ## Features
 
 *   tagging (support for 255 distinct tags)
@@ -52,6 +48,14 @@ RefId
     If the validity of the encoded timestamp and tag are required for any secure
     operations, the refid SHOULD be externally verified before parsing/decoding.
     An example of this could be a wrapping encoder/decoder doing hmac signing and verification.
+
+## Inspirations
+
+*   https://github.com/gofrs/uuid  
+    gofrs' UUIDv7 might be a better option if you need something standard.
+*   https://github.com/uuid6/uuid6-ietf-draft,
+    https://github.com/ietf-wg-uuidrev/rfc4122bis  
+    UUIDv6/v7 drafts
 
 ## Installation
 ```
