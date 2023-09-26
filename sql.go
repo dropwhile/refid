@@ -42,8 +42,8 @@ func (r RefId) Value() (driver.Value, error) {
 }
 
 // Scan implements the [sql.Scanner] interface.
-// A 16-byte slice will be handled by [UnmarshalBinary], while
-// a longer byte slice or a string will be handled by [UnmarshalText].
+// A 16-byte slice will be handled by [RefId.UnmarshalBinary], while
+// a longer byte slice or a string will be handled by [RefId.UnmarshalText].
 func (r *RefId) Scan(src interface{}) error {
 	switch src := src.(type) {
 	case RefId: // support gorm convert from RefId to NullRefId

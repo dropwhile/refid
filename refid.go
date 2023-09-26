@@ -71,9 +71,10 @@ func NewTagged(tag byte) (RefId, error) {
 
 // Parse parses a textual RefId representation, and returns
 // a [RefId]. Supports parsing the following text formats:
-// * native - base32 (Crockford's alphabet)
-// * base64
-// * base16/hex
+//
+//   - native/base32 (Crockford's alphabet)
+//   - base64
+//   - base16/hex
 //
 // Will return an error on parse failure.
 func Parse(s string) (RefId, error) {
