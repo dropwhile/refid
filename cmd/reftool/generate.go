@@ -12,10 +12,13 @@ import (
 var (
 	TagValue uint8
 	TimeAt   string
+	Only     string
 )
 
 func init() {
 	generateCmd.Flags().Uint8VarP(&TagValue, "tag-value", "t", 0, "tag value")
+	generateCmd.Flags().StringVarP(&Only, "only", "o", "native", "output only encoding result. optional argument: native, base64, hex")
+	generateCmd.Flags().Lookup("only").NoOptDefVal = "native"
 	generateCmd.Flags().StringVarP(
 		&TimeAt, "when", "w", "",
 		"the date/time to use in the token, truncated to seconds resolution. Uses RFC3339 format",
@@ -44,12 +47,24 @@ var generateCmd = &cobra.Command{
 			refId.SetTime(ts)
 		}
 
-		tx := refId.Time()
-		fmt.Printf("native enc:   %s\n", refId.String())
-		fmt.Printf("hex enc:      %s\n", refId.ToHexString())
-		fmt.Printf("base64 enc:   %s\n", refId.ToBase64String())
-		fmt.Printf("tag value:    %d\n", refId.Tag())
-		fmt.Printf("time(string): %s\n", tx.Format(time.RFC3339Nano))
-		fmt.Printf("time(micros): %d\n", tx.UnixMicro())
+		switch Only {
+		case "base64":
+			fmt.Println(refId.ToBase64String())
+			return
+		case "hex":
+			fmt.Println(refId.ToHexString())
+			return
+		case "":
+			tx := refId.Time()
+			fmt.Printf("native enc:   %s\n", refId.String())
+			fmt.Printf("hex enc:      %s\n", refId.ToHexString())
+			fmt.Printf("base64 enc:   %s\n", refId.ToBase64String())
+			fmt.Printf("tag value:    %d\n", refId.Tag())
+			fmt.Printf("time(string): %s\n", tx.Format(time.RFC3339Nano))
+			fmt.Printf("time(micros): %d\n", tx.UnixMicro())
+		default:
+			fmt.Println(refId.String())
+			return
+		}
 	},
 }
