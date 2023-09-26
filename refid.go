@@ -238,6 +238,7 @@ func (r RefId) ToHexString() string {
 	return hex.EncodeToString(r[:])
 }
 
+// Format implements the fmt.Formatter interface.
 func (r RefId) Format(f fmt.State, c rune) {
 	if c == 'v' && f.Flag('#') {
 		fmt.Fprintf(f, "%#v", r.Bytes())
@@ -267,10 +268,13 @@ func (r RefId) Format(f fmt.State, c rune) {
 	}
 }
 
+// MarshalText implements the encoding.TextMarshaler interface.
 func (r RefId) MarshalText() ([]byte, error) {
 	return []byte(r.String()), nil
 }
 
+// UnmarshalText implements the encoding.TextUnmarshaler interface.
+// It will return an error if the slice isn't of appropriate size.
 func (r *RefId) UnmarshalText(b []byte) error {
 	decLen := WordSafeEncoding.DecodedLen(len(b))
 	if decLen != size {
@@ -315,10 +319,12 @@ func (r *RefId) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
+// MarshalJson implements the json.Marshaler interface.
 func (r RefId) MarshalJSON() ([]byte, error) {
 	return json.Marshal(r.String())
 }
 
+// UnmarshalJson implements the json.Unmarshaler interface.
 func (r *RefId) UnmarshalJSON(b []byte) error {
 	var s string
 	if err := json.Unmarshal(b, &s); err != nil {
