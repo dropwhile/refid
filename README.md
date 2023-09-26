@@ -170,7 +170,7 @@ time(micros): 1695599258954477
 BgZJ-i1F2wALdZFJrWvNzA
 
 # genrate a refid with a tag of 2, at a specific timestamp
-% generate -t 2 -w "2023-01-01T00:00:11.123456Z"
+% reftool generate -t 2 -w "2023-01-01T00:00:11.123456Z"
 native enc:   0qrjh15pzc004nzrkbpcp2v0wm
 hex enc:      05f12884b6fb000257f89aeccb0b60e5
 base64 enc:   BfEohLb7AAJX-Jrsywtg5Q
