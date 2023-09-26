@@ -14,9 +14,10 @@ func init() {
 }
 
 var decodeCmd = &cobra.Command{
-	Use:   "decode",
-	Short: "Decode and print the details of a refid",
-	Args:  cobra.ExactArgs(1),
+	Use:     "decode",
+	Aliases: []string{"parse"},
+	Short:   "Decode and print the details of a refid",
+	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		refIdTxtLen := len(args[0])
 		var parseFunc func(string) (refid.RefId, error)

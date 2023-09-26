@@ -27,8 +27,9 @@ func init() {
 }
 
 var generateCmd = &cobra.Command{
-	Use:   "generate",
-	Short: "Generate a new refid and print the details",
+	Use:     "generate",
+	Aliases: []string{"gen"},
+	Short:   "Generate a new refid and print the details",
 	Run: func(cmd *cobra.Command, args []string) {
 		var refId refid.RefId
 		if TagValue != 0 {
