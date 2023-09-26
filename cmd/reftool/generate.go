@@ -17,7 +17,7 @@ var (
 
 func init() {
 	generateCmd.Flags().Uint8VarP(&TagValue, "tag-value", "t", 0, "tag value")
-	generateCmd.Flags().StringVarP(&Only, "only", "o", "native", "output only encoding result. optional argument: native, base64, hex")
+	generateCmd.Flags().StringVarP(&Only, "only", "o", "", "output only encoding result. optional argument: native, base64, hex")
 	generateCmd.Flags().Lookup("only").NoOptDefVal = "native"
 	generateCmd.Flags().StringVarP(
 		&TimeAt, "when", "w", "",
