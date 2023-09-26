@@ -17,8 +17,8 @@ import (
 var (
 	// crockford base32
 	// ref: https://en.wikipedia.org/wiki/Base32#Crockford's_Base32
-	Alphabet         = "0123456789abcdefghjkmnpqrstvwxyz"
-	WordSafeEncoding = base32.NewEncoding(Alphabet).WithPadding(base32.NoPadding)
+	alphabet      = "0123456789abcdefghjkmnpqrstvwxyz"
+	base32Encoder = base32.NewEncoding(alphabet).WithPadding(base32.NoPadding)
 	// Nil is the nil RefId, that has all 128 bits set to zero.
 	Nil = RefId{}
 )
@@ -30,6 +30,18 @@ const (
 	randStart = 8  // offset where rand_b starts
 )
 
+// A RefId is a 16 byte identifier that is:
+//   - unix timestamp with microsecond precision
+//     48 bits of microseconds from 1970 (about 2280 or so years worth)
+//   - sql index friendly
+//   - tagging support (support for 255 distinct tag types)
+//   - supports go/sql scanner/valuer
+//   - multiple encodings supported: native (base32), base64, base16 (hex)
+//   - similar to UUIDv7, with different tradeoffs:
+//     slightly larger random section,
+//     tag support,
+//     no UUID version field,
+//     not an rfc standard
 type RefId [size]byte
 
 // New returns a new RefId.
@@ -220,7 +232,7 @@ func (r RefId) Bytes() []byte {
 // String returns the native (base32 w/Crockford alphabet) textual represenation
 // of a RefId
 func (r RefId) String() string {
-	return WordSafeEncoding.EncodeToString(r[:])
+	return base32Encoder.EncodeToString(r[:])
 }
 
 // ToString is an alias of String
@@ -276,7 +288,7 @@ func (r RefId) MarshalText() ([]byte, error) {
 // UnmarshalText implements the encoding.TextUnmarshaler interface.
 // It will return an error if the slice isn't of appropriate size.
 func (r *RefId) UnmarshalText(b []byte) error {
-	decLen := WordSafeEncoding.DecodedLen(len(b))
+	decLen := base32Encoder.DecodedLen(len(b))
 	if decLen != size {
 		return fmt.Errorf("refid: RefId must be exactly %d bytes long, got %d bytes", size, decLen)
 	}
@@ -292,7 +304,7 @@ func (r *RefId) UnmarshalText(b []byte) error {
 		}
 	}
 	bx := make([]byte, size)
-	n, err := WordSafeEncoding.Decode(bx, b)
+	n, err := base32Encoder.Decode(bx, b)
 	if err != nil {
 		return err
 	}
