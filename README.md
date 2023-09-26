@@ -67,30 +67,30 @@ go get -u github.com/dropwhile/refid
 ### Simple
 ```go
 // generate refid
-refId, err := refid.New()
+rId, err := refid.New()
 // generate refid (or panic)
-refId = refid.Must(refid.New())
+rId = refid.Must(refid.New())
 
 // encoding...
 // encode to native encoding (base32 with Crockford alphabet)
-s := refId.String() // "0r326xw2xbpga5tya7px89m7hw"
+s := rId.String() // "0r326xw2xbpga5tya7px89m7hw"
 // encode to base64 encoding
-s = refId.ToBase64String() // "BgYjd4Lq7QUXXlHt1CaHjw"
+s = rId.ToBase64String() // "BgYjd4Lq7QUXXlHt1CaHjw"
 // encode to hex encoding
-s = refId.ToHexString() // "0606237782eaed05175e51edd426878f"
+s = rId.ToHexString() // "0606237782eaed05175e51edd426878f"
 // raw bytes
-b := refId.Bytes()
+b := rId.Bytes()
 
 // decoding...
 // decode from native
-refId2, err := refid.Parse(s)
+rId2, err := refid.Parse(s)
 // decode from base64
-refId2, err = FromBase64String(s)
+rId2, err = refid.FromBase64String(s)
 // decode from hex
-refId2, err = FromHexString(s)
+rId2, err = refid.FromHexString(s)
 
-// get the time out of a refId (as a time.Time)
-var ts time.Time = refId2.Time()
+// get the time out of a RefId (as a time.Time)
+var ts time.Time = rId2.Time()
 ```
 
 ### Tagging
@@ -99,18 +99,18 @@ Simple tagging usage:
 ```go
 myTag := 2
 
-// generate a refId with tag set to 1
-refId = refid.Must(refid.NewTagged(1))
+// generate a RefId with tag set to 1
+rId = refid.Must(refid.NewTagged(1))
 // you can also set it manually after generation
-refId.SetTag(myTag)
+rId.SetTag(myTag)
 // check if it is tagged
-refId.Tagged() // true
+rId.Tagged() // true
 // check if it has a specific tag
-refId.HasTag(1) // false
-refId.HasTag(2) // true
+rId.HasTag(1) // false
+rId.HasTag(2) // true
 
 
-s := refId.String()
+s := rId.String()
 // require desired tag or fail parsing
 r, err := refid.ParseTagged(1, s) // err != nil here, as refid was tagged 2
 r, err = refid.ParseTagged(2, s) // err == nil here, as refid was tagged 2
@@ -148,6 +148,7 @@ go install github.com/dropwhile/refid/cmd/reftool@latest
 ```
 
 ```
+# generate a refid with a tag of 5
 % reftool generate -t 5
 native enc:   0r326xw2xbpga5tya7px89m7hw
 hex enc:      0606237782eaed05175e51edd426878f
@@ -156,6 +157,19 @@ tag value:    5
 time(string): 2023-09-24T23:47:38.954477Z
 time(micros): 1695599258954477
 
+# generate a refid with a tag of 5, and only output the native(base32) encoding
+% reftool generate -t 5 -o
+0r34ky6h51r012an8skhbsvxt0
+
+# generate a refid with a tag of 5, and only output the hex encoding
+% reftool generate -t 5 -o=hex
+060649f82794f10039169e91d0696763
+
+# generate a refid with a tag of 5, and only output the base64 encoding
+% reftool generate -o=base64
+BgZJ-i1F2wALdZFJrWvNzA
+
+# genrate a refid with a tag of 2, at a specific timestamp
 % generate -t 2 -w "2023-01-01T00:00:11.123456Z"
 native enc:   0qrjh15pzc004nzrkbpcp2v0wm
 hex enc:      05f12884b6fb000257f89aeccb0b60e5
@@ -164,6 +178,7 @@ tag value:    2
 time(string): 2023-01-01T00:00:11.123456Z
 time(micros): 1672531211123456
 
+# decode a refid and display
 % reftool decode 0qrjh15pzc004nzrkbpcp2v0wm
 native enc:   0qrjh15pzc004nzrkbpcp2v0wm
 hex enc:      05f12884b6fb000257f89aeccb0b60e5
