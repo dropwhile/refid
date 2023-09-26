@@ -1,7 +1,7 @@
 package refid
 
 // A matcher that supports the following interfaces:
-//   - [github.com/pashagolub/pgxmock.Argument]
+//   - [github.com/pashagolub/pgxmock/v3.Argument]
 //   - [github.com/DATA-DOG/go-sqlmock.Argument]
 type AnyMatcher struct {
 	tag byte
