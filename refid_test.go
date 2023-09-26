@@ -17,6 +17,25 @@ var (
 	testValWithTag = "0r2nbq0wqhjg386167t0gcd1gw"
 )
 
+func TestParseVarious(t *testing.T) {
+	_, err := Parse("0r2nbq0wqhjg186167t0gcd1gw")
+	assert.NilError(t, err)
+	_, err = Parse("0r2nbq0wqhjg386167t0gcd1gw")
+	assert.NilError(t, err)
+	_, err = Parse("060639fff99b6b006e8377c0a1b18a1c")
+	assert.NilError(t, err)
+	_, err = Parse("BgY6BiZo3gBH5QTfqiX0kA")
+	assert.NilError(t, err)
+	_, err = Parse("nope")
+	assert.Assert(t, err != nil, "expected to fail parsing invalid refid")
+	_, err = Parse("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz")
+	assert.Assert(t, err != nil, "expected to fail parsing invalid refid")
+	_, err = Parse("!!!!!!!!!!!!!!!!!!!!!!")
+	assert.Assert(t, err != nil, "expected to fail parsing invalid refid")
+	_, err = Parse("!!!!!!!!!!!!!!!!!!!!!!!!!!")
+	assert.Assert(t, err != nil, "expected to fail parsing invalid refid")
+}
+
 func TestGetTime(t *testing.T) {
 	t.Parallel()
 

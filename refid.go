@@ -63,11 +63,18 @@ func MustNewTagged(tag byte) RefId {
 
 func Parse(s string) (RefId, error) {
 	var r RefId
-	err := r.UnmarshalText([]byte(s))
-	if err != nil {
-		return r, err
+	var err error
+	switch len(s) {
+	case 26: // native
+		err = r.UnmarshalText([]byte(s))
+	case 22: // base64
+		r, err = FromBase64String(s)
+	case 32: // hex
+		r, err = FromHexString(s)
+	default:
+		return r, fmt.Errorf("parse error: incorrect size")
 	}
-	return r, nil
+	return r, err
 }
 
 func MustParse(s string) RefId {
@@ -142,6 +149,19 @@ func (r *RefId) SetTime(ts time.Time) *RefId {
 	return r
 }
 
+func (r RefId) Time() time.Time {
+	u := r[timeStart:]
+	t := 0 |
+		(int64(u[0]) << 48) |
+		(int64(u[1]) << 40) |
+		(int64(u[2]) << 32) |
+		(int64(u[3]) << 24) |
+		(int64(u[4]) << 16) |
+		(int64(u[5]) << 8) |
+		int64(u[6])
+	return time.UnixMicro(t).UTC()
+}
+
 func (r *RefId) SetTag(tag byte) *RefId {
 	r[tagIndex] = tag
 	return r
@@ -172,71 +192,10 @@ func (r RefId) Equal(other RefId) bool {
 	return r.String() == other.String()
 }
 
-func (r RefId) MarshalText() ([]byte, error) {
-	return []byte(r.String()), nil
-}
-
-func (r RefId) Time() time.Time {
-	u := r[timeStart:]
-	t := 0 |
-		(int64(u[0]) << 48) |
-		(int64(u[1]) << 40) |
-		(int64(u[2]) << 32) |
-		(int64(u[3]) << 24) |
-		(int64(u[4]) << 16) |
-		(int64(u[5]) << 8) |
-		int64(u[6])
-	return time.UnixMicro(t).UTC()
-}
-
-func (r *RefId) UnmarshalText(b []byte) error {
-	decLen := WordSafeEncoding.DecodedLen(len(b))
-	if decLen != size {
-		return fmt.Errorf("refid: RefId must be exactly %d bytes long, got %d bytes", size, decLen)
-	}
-
-	// lowercase, then replace ambigious chars
-	b = bytes.ToLower(b)
-	for i := range b {
-		switch b[i] {
-		case 'i', 'l':
-			b[i] = '1'
-		case 'o', 'O':
-			b[i] = '0'
-		}
-	}
-	bx := make([]byte, size)
-	n, err := WordSafeEncoding.Decode(bx, b)
-	if err != nil {
-		return err
-	}
-	if n != size {
-		return fmt.Errorf("wrong unmarshal size")
-	}
-	copy(r[:], bx[:])
-	return nil
-}
-
 func (r RefId) Bytes() []byte {
 	b := make([]byte, size)
 	copy(b[:], r[:])
 	return b
-}
-
-// MarshalBinary implements the encoding.BinaryMarshaler interface.
-func (r RefId) MarshalBinary() ([]byte, error) {
-	return r.Bytes(), nil
-}
-
-// UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
-// It will return an error if the slice isn't of appropriate size.
-func (r *RefId) UnmarshalBinary(data []byte) error {
-	dlen := len(data)
-	if dlen != size {
-		return fmt.Errorf("refid: RefId must be exactly %d bytes long, got %d bytes", size, dlen)
-	}
-	copy(r[:], data[:])
-	return nil
 }
 
 func (r RefId) String() string {
@@ -282,6 +241,54 @@ func (r RefId) Format(f fmt.State, c rune) {
 		// invalid/unsupported format verb
 		fmt.Fprintf(f, "%%!%c(refid.RefId=%s)", c, r.String())
 	}
+}
+
+func (r RefId) MarshalText() ([]byte, error) {
+	return []byte(r.String()), nil
+}
+
+func (r *RefId) UnmarshalText(b []byte) error {
+	decLen := WordSafeEncoding.DecodedLen(len(b))
+	if decLen != size {
+		return fmt.Errorf("refid: RefId must be exactly %d bytes long, got %d bytes", size, decLen)
+	}
+
+	// lowercase, then replace ambigious chars
+	b = bytes.ToLower(b)
+	for i := range b {
+		switch b[i] {
+		case 'i', 'l':
+			b[i] = '1'
+		case 'o', 'O':
+			b[i] = '0'
+		}
+	}
+	bx := make([]byte, size)
+	n, err := WordSafeEncoding.Decode(bx, b)
+	if err != nil {
+		return err
+	}
+	if n != size {
+		return fmt.Errorf("wrong unmarshal size")
+	}
+	copy(r[:], bx[:])
+	return nil
+}
+
+// MarshalBinary implements the encoding.BinaryMarshaler interface.
+func (r RefId) MarshalBinary() ([]byte, error) {
+	return r.Bytes(), nil
+}
+
+// UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
+// It will return an error if the slice isn't of appropriate size.
+func (r *RefId) UnmarshalBinary(data []byte) error {
+	dlen := len(data)
+	if dlen != size {
+		return fmt.Errorf("refid: RefId must be exactly %d bytes long, got %d bytes", size, dlen)
+	}
+	copy(r[:], data[:])
+	return nil
 }
 
 func (r RefId) MarshalJSON() ([]byte, error) {
