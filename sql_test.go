@@ -1,4 +1,4 @@
-// Copyright (C) 2013-2018 by Maxim Bublis <b@codemonkey.ru>
+// Original Work: Copyright (C) 2013-2018 by Maxim Bublis <b@codemonkey.ru>
 // Modifications: Copyright (C) 2023 Eli Janssen
 //
 // Permission is hereby granted, free of charge, to any person obtaining

@@ -1,3 +1,7 @@
+// Copyright (c) 2023 Eli Janssen
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file.
+
 package refid
 
 // A Tagger is a conveniece container for encoding and parsing
