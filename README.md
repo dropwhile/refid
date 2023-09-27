@@ -8,7 +8,8 @@ RefID
 
 ## About
 
-A RefID is a sortable unique identifier, similar to UUIDv7, with a few difference.
+A RefID (short for Reference Identifier) is a sortable unique identifier,
+similar to UUIDv7, with a few difference.
 
 ```
  0                   1                   2                   3
@@ -22,11 +23,11 @@ A RefID is a sortable unique identifier, similar to UUIDv7, with a few differenc
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                             rand_b                            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-7 bytes unix_ts_µs:
-    48 bits of microseconds from 1970 (about 2280 or so years worth)
-1 byte tag:
+56 bits of unix_ts_µs:
+    microseconds since epoch - until about year 4200 or so
+8 bits tag:
     255 separate tags (0 being untagged)
-8 bytes random pad:
+64 bits random pad:
     fill with crypto/rand random
 ```
 
@@ -37,10 +38,14 @@ A RefID is a sortable unique identifier, similar to UUIDv7, with a few differenc
 *   supports go/sql scanner/valuer
 *   multiple encodings supported: native (base32), base64, base16 (hex)
 *   similar to UUIDv7, with different tradeoffs
-    *    slightly larger random section
-    *    tag support
-    *    no UUID version field
-    *    not an rfc standard
+    *   tag support
+    *   slightly larger time section (56 vs 48 bits), resulting in microsecond
+        granularity instead of millisecond granularity. This also reduces the need
+        for "clock sequencing" support.
+    *   slightly smaller random section (64 vs 74 bits), though still good collision
+        resistance due to more granular time section
+    *   no UUID version field
+    *   not an rfc standard
 
 ## Non-Features
 
@@ -67,30 +72,30 @@ go get -u github.com/dropwhile/refid
 ### Simple
 ```go
 // generate refid
-rId, err := refid.New()
+rID, err := refid.New()
 // generate refid (or panic)
-rId = refid.Must(refid.New())
+rID = refid.Must(refid.New())
 
 // encoding...
 // encode to native encoding (base32 with Crockford alphabet)
-s := rId.String() // "0r326xw2xbpga5tya7px89m7hw"
+s := rID.String() // "0r326xw2xbpga5tya7px89m7hw"
 // encode to base64 encoding
-s = rId.ToBase64String() // "BgYjd4Lq7QUXXlHt1CaHjw"
+s = rID.ToBase64String() // "BgYjd4Lq7QUXXlHt1CaHjw"
 // encode to hex encoding
-s = rId.ToHexString() // "0606237782eaed05175e51edd426878f"
+s = rID.ToHexString() // "0606237782eaed05175e51edd426878f"
 // raw bytes
-b := rId.Bytes()
+b := rID.Bytes()
 
 // decoding...
 // decode from native
-rId2, err := refid.Parse(s)
+rID, err := refid.Parse(s)
 // decode from base64
-rId2, err = refid.FromBase64String(s)
+rID, err = refid.FromBase64String(s)
 // decode from hex
-rId2, err = refid.FromHexString(s)
+rID, err = refid.FromHexString(s)
 
 // get the time out of a RefID (as a time.Time)
-var ts time.Time = rId2.Time()
+var ts time.Time = rID.Time()
 ```
 
 ### Tagging
@@ -100,17 +105,17 @@ Simple tagging usage:
 myTag := 2
 
 // generate a RefID with tag set to 1
-rId = refid.Must(refid.NewTagged(1))
+rID = refid.Must(refid.NewTagged(1))
 // you can also set it manually after generation
-rId.SetTag(myTag)
+rID.SetTag(myTag)
 // check if it is tagged
-rId.Tagged() // true
+rID.Tagged() // true
 // check if it has a specific tag
-rId.HasTag(1) // false
-rId.HasTag(2) // true
+rID.HasTag(1) // false
+rID.HasTag(2) // true
 
 
-s := rId.String()
+s := rID.String()
 // require desired tag or fail parsing
 r, err := refid.ParseTagged(1, s) // err != nil here, as refid was tagged 2
 r, err = refid.ParseTagged(2, s) // err == nil here, as refid was tagged 2

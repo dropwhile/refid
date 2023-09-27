@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/dropwhile/refid"
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
@@ -17,11 +16,13 @@ var (
 	TagValue uint8
 	TimeAt   string
 	Only     string
+	Random   bool
 )
 
 func init() {
 	generateCmd.Flags().Uint8VarP(&TagValue, "tag-value", "t", 0, "tag value")
 	generateCmd.Flags().StringVarP(&Only, "only", "o", "", "output only encoding result. optional argument: native, base64, hex")
+	generateCmd.Flags().BoolVarP(&Random, "random", "r", false, "generate a RefIdRandom instead of a standard type")
 	generateCmd.Flags().Lookup("only").NoOptDefVal = "native"
 	generateCmd.Flags().StringVarP(
 		&TimeAt, "when", "w", "",
@@ -35,41 +36,37 @@ var generateCmd = &cobra.Command{
 	Aliases: []string{"gen"},
 	Short:   "Generate a new refid and print the details",
 	Run: func(cmd *cobra.Command, args []string) {
-		var refId refid.RefID
+		var xID refid.RefID
 		if TagValue != 0 {
-			refId = refid.Must(refid.NewTagged(TagValue))
-		} else {
-			refId = refid.Must(refid.New())
-		}
-
-		var ts time.Time
-		if TimeAt != "" {
-			var err error
-			ts, err = time.Parse(time.RFC3339, TimeAt)
-			if err != nil {
-				log.Fatal().Err(err).Msg("error parsing datetime")
+			if Random {
+				xID = refid.Must(refid.NewRandomTagged(TagValue))
+			} else {
+				xID = refid.Must(refid.NewTagged(TagValue))
 			}
-			refId.SetTime(ts)
+		} else {
+			if Random {
+				xID = refid.Must(refid.NewRandom())
+			} else {
+				xID = refid.Must(refid.New())
+			}
 		}
 
 		switch Only {
 		case "base64":
-			fmt.Println(refId.ToBase64String())
-			return
+			fmt.Println(xID.ToBase64String())
 		case "hex":
-			fmt.Println(refId.ToHexString())
-			return
+			fmt.Println(xID.ToHexString())
 		case "":
-			tx := refId.Time()
-			fmt.Printf("native enc:   %s\n", refId.String())
-			fmt.Printf("hex enc:      %s\n", refId.ToHexString())
-			fmt.Printf("base64 enc:   %s\n", refId.ToBase64String())
-			fmt.Printf("tag value:    %d\n", refId.Tag())
+			tx := xID.Time().UTC()
+			fmt.Printf("native enc:   %s\n", xID.String())
+			fmt.Printf("hex enc:      %s\n", xID.ToHexString())
+			fmt.Printf("base64 enc:   %s\n", xID.ToBase64String())
+			fmt.Printf("tag value:    %d\n", xID.Tag())
+			fmt.Printf("type:         %s\n", xID.Type())
 			fmt.Printf("time(string): %s\n", tx.Format(time.RFC3339Nano))
 			fmt.Printf("time(micros): %d\n", tx.UnixMicro())
 		default:
-			fmt.Println(refId.String())
-			return
+			fmt.Println(xID.String())
 		}
 	},
 }

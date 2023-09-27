@@ -25,31 +25,22 @@ var (
 
 const (
 	size      = 16 // expected size in bytes
-	timeStart = 0  // offset where timestamp starts
+	typeIndex = 6  // offset where type byte starts (only lowest bit)
 	tagIndex  = 7  // offset where tag starts
-	randStart = 8  // offset where rand_b starts
 )
 
-// A RefID is a 16 byte identifier that is:
-//   - unix timestamp with microsecond precision
-//     48 bits of microseconds from 1970 (about 2280 or so years worth)
-//   - sql index friendly
+// A RefID is a 16 byte identifier that has:
 //   - tagging support (support for 255 distinct tag types)
-//   - supports go/sql scanner/valuer
+//   - go/sql scanner/valuer support
 //   - multiple encodings supported: native (base32), base64, base16 (hex)
-//   - similar to UUIDv7, with different tradeoffs:
-//     slightly larger random section,
-//     tag support,
-//     no UUID version field,
-//     not an rfc standard
 type RefID [size]byte
 
-// New returns a new [RefID].
+// New returns a new [TimePrefix] type [RefID].
 //
 // If random bytes cannot be generated, it will return an error.
 func New() (RefID, error) {
 	var r RefID
-	b, err := generate()
+	b, err := generateTimePrefixType()
 	if err != nil {
 		return r, err
 	}
@@ -57,11 +48,36 @@ func New() (RefID, error) {
 	return r, nil
 }
 
-// NewTagged returns a [RefID] tagged with tag.
+// NewRandom returns a new [RandomPrefix] type [RefID].
+//
+// If random bytes cannot be generated, it will return an error.
+func NewRandom() (RefID, error) {
+	var r RefID
+	b, err := generateRandomPrefixType()
+	if err != nil {
+		return r, err
+	}
+	copy(r[:], b[:])
+	return r, nil
+}
+
+// NewTagged returns a new [TimePrefix] type [RefID] tagged with tag.
 //
 // If random bytes cannot be generated, it will return an error.
 func NewTagged(tag byte) (RefID, error) {
 	r, err := New()
+	if err != nil {
+		return r, err
+	}
+	r.SetTag(tag)
+	return r, nil
+}
+
+// NewRandomTagged returns a new [RandomPrefix] type [RefID] tagged with tag.
+//
+// If random bytes cannot be generated, it will return an error.
+func NewRandomTagged(tag byte) (RefID, error) {
+	r, err := NewRandom()
 	if err != nil {
 		return r, err
 	}
@@ -79,35 +95,32 @@ func NewTagged(tag byte) (RefID, error) {
 // Will return an error on parse failure.
 func Parse(s string) (RefID, error) {
 	var r RefID
-	var err error
-	switch len(s) {
-	case 26: // native
-		err = r.UnmarshalText([]byte(s))
-	case 22: // base64
-		r, err = FromBase64String(s)
-	case 32: // hex
-		r, err = FromHexString(s)
-	default:
-		return r, fmt.Errorf("parse error: incorrect size")
-	}
+	err := r.UnmarshalText([]byte(s))
 	return r, err
 }
 
-// ParseTagged parses a textual RefID representation
-// (same formats as Parse),while additionally requiring
-// the parsed RefID to be tagged with tag, and returns
+// ParseWithRequire parses a textual RefID representation
+// (same formats as Parse), while additionally requiring
+// each reqs [Requirement] to pass, and returns
 // a [RefID].
 //
-// Returns an error if RefID fails to parse or if RefID
-// is not tagged with tag.
-func ParseTagged(tag byte, s string) (RefID, error) {
+// Returns an error if RefID fails to parse or if any of the
+// reqs Requirements fail.
+//
+// Example:
+//
+//	ParseWithRequire("afd661f4f2tg2vr3dca92qp6k8", HasType(RandomPrefix))
+func ParseWithRequire(s string, reqs ...Requirement) (RefID, error) {
 	r, err := Parse(s)
 	if err != nil {
 		return r, err
 	}
 
-	if !r.HasTag(tag) {
-		return r, fmt.Errorf("RefID tag mismatch: %d != %d", r[tagIndex], tag)
+	for _, f := range reqs {
+		err = f(r)
+		if err != nil {
+			return r, err
+		}
 	}
 	return r, nil
 }
@@ -118,10 +131,7 @@ func ParseTagged(tag byte, s string) (RefID, error) {
 func FromBytes(input []byte) (RefID, error) {
 	var r RefID
 	err := r.UnmarshalBinary(input)
-	if err != nil {
-		return r, err
-	}
-	return r, nil
+	return r, err
 }
 
 // FromString is an alias of [Parse].
@@ -129,59 +139,33 @@ func FromString(s string) (RefID, error) {
 	return Parse(s)
 }
 
-// FromBase64String parses a base64 string and returns
-// a [RefID].
-// Returns an error if the base64 string is of improper size
-// or otherwise fails to parse.
-func FromBase64String(input string) (RefID, error) {
-	var r RefID
-	bx, err := base64.RawURLEncoding.DecodeString(input)
-	if err != nil {
-		return r, err
-	}
-	if len(bx) != size {
-		return r, fmt.Errorf("wrong unmarshal size")
-	}
-	copy(r[:], bx[:])
-	return r, nil
-}
-
-// FromHexString parses a base16/hex string and returns
-// a [RefID].
-// Returns an error if the base16/hex string is of improper size
-// or otherwise fails to parse.
-func FromHexString(input string) (RefID, error) {
-	var r RefID
-	bx, err := hex.DecodeString(input)
-	if err != nil {
-		return r, err
-	}
-	if len(bx) != size {
-		return r, fmt.Errorf("wrong unmarshal size")
-	}
-	copy(r[:], bx[:])
-	return r, nil
-}
-
 // SetTime sets the time component of a RefID to the time
 // specified by ts.
-func (r *RefID) SetTime(ts time.Time) *RefID {
-	setTime(r[:], ts.UTC().UnixMicro())
-	return r
+func (r *RefID) SetTime(ts time.Time) error {
+	// if Radom type, do not set time, just return
+	if r.HasType(RandomPrefix) {
+		return fmt.Errorf("cant set time of RandomPrefix type")
+	}
+	setTime(r[:], ts.UTC().UnixMilli())
+	return nil
 }
 
 // Time returns the timestamp portion of a [RefID] as a [time.Time]
 func (r RefID) Time() time.Time {
-	u := r[timeStart:]
+	if r.HasType(RandomPrefix) {
+		// if Random prefix, we have no time, so just
+		// return the zero time
+		return time.UnixMilli(0)
+	}
+	u := r[:]
 	t := 0 |
-		(int64(u[0]) << 48) |
-		(int64(u[1]) << 40) |
-		(int64(u[2]) << 32) |
-		(int64(u[3]) << 24) |
-		(int64(u[4]) << 16) |
-		(int64(u[5]) << 8) |
-		int64(u[6])
-	return time.UnixMicro(t).UTC()
+		(int64(u[0]) << 40) |
+		(int64(u[1]) << 32) |
+		(int64(u[2]) << 24) |
+		(int64(u[3]) << 16) |
+		(int64(u[4]) << 8) |
+		int64(u[5])
+	return time.UnixMilli(t).UTC()
 }
 
 // SetTag sets the [RefID] tag to the specified value.
@@ -213,6 +197,16 @@ func (r RefID) Tag() byte {
 	return r[tagIndex]
 }
 
+// HasType reports whether the [RefId] is of type t.
+func (r RefID) HasType(t Type) bool {
+	return r[typeIndex]&0x01 == byte(t)
+}
+
+// Type returns the type of the RefID.
+func (r RefID) Type() Type {
+	return Type(r[typeIndex] & 0x01)
+}
+
 // IsNil reports if the [RefID] is the nil value RefID.
 func (r RefID) IsNil() bool {
 	return r == Nil
@@ -239,6 +233,11 @@ func (r RefID) String() string {
 
 // ToString is an alias of [String]
 func (r RefID) ToString() string {
+	return r.String()
+}
+
+// ToBase32String is an alias of [String]
+func (r RefID) ToBase32String() string {
 	return r.String()
 }
 
@@ -290,30 +289,50 @@ func (r RefID) MarshalText() ([]byte, error) {
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 // It will return an error if the slice isn't of appropriate size.
 func (r *RefID) UnmarshalText(b []byte) error {
-	decLen := base32Encoder.DecodedLen(len(b))
-	if decLen != size {
-		return fmt.Errorf("refid: RefID must be exactly %d bytes long, got %d bytes", size, decLen)
+	bx := make([]byte, size)
+	switch len(b) {
+	case 26: // native
+		// lowercase, then replace ambigious chars
+		b = bytes.ToLower(b)
+		for i := range b {
+			switch b[i] {
+			case 'i', 'l':
+				b[i] = '1'
+			case 'o', 'O':
+				b[i] = '0'
+			}
+		}
+		n, err := base32Encoder.Decode(bx, b)
+		if err != nil {
+			return err
+		}
+		if n != size {
+			return fmt.Errorf("wrong unmarshal size")
+		}
+	case 22: // base64
+		n, err := base64.RawURLEncoding.Decode(bx, b)
+		if err != nil {
+			return err
+		}
+		if n != size {
+			return fmt.Errorf("wrong unmarshal size")
+		}
+	case 32: // hex
+		n, err := hex.Decode(bx, b)
+		if err != nil {
+			return err
+		}
+		if n != size {
+			return fmt.Errorf("wrong unmarshal size")
+		}
+	default:
+		return fmt.Errorf("parse error: incorrect size")
 	}
 
-	// lowercase, then replace ambigious chars
-	b = bytes.ToLower(b)
-	for i := range b {
-		switch b[i] {
-		case 'i', 'l':
-			b[i] = '1'
-		case 'o', 'O':
-			b[i] = '0'
-		}
-	}
-	bx := make([]byte, size)
-	n, err := base32Encoder.Decode(bx, b)
+	err := r.UnmarshalBinary(bx)
 	if err != nil {
 		return err
 	}
-	if n != size {
-		return fmt.Errorf("wrong unmarshal size")
-	}
-	copy(r[:], bx[:])
 	return nil
 }
 

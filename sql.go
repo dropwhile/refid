@@ -57,19 +57,13 @@ func (r *RefID) Scan(src interface{}) error {
 		return r.UnmarshalText(src)
 
 	case string:
-		var parseFunc func(string) (RefID, error)
 		switch len(src) {
-		case 26: // native
-			parseFunc = Parse
-		case 32: // hex
-			parseFunc = FromHexString
-		case 22: // base64
-			parseFunc = FromBase64String
+		case 26, 32, 22:
+			// ok
 		default:
 			return fmt.Errorf("refid: cannot convert %T to RefID", src)
 		}
-		uu, err := parseFunc(src)
-		*r = uu
+		err := r.UnmarshalText([]byte(src))
 		return err
 	}
 
@@ -114,7 +108,7 @@ func (u NullRefID) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals a [NullRefID]
 func (u *NullRefID) UnmarshalJSON(b []byte) error {
-	if string(b) == "null" {
+	if string(b) == "null" || string(b) == "00000000000000000000000000" {
 		u.RefID, u.Valid = Nil, false
 		return nil
 	}

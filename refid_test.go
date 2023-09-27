@@ -17,19 +17,43 @@ import (
 
 var (
 	refTagTest     = byte(1)
-	testValWoutTag = "0r2nbq0wqhjg186167t0gcd1gw"
-	testValWithTag = "0r2nbq0wqhjg386167t0gcd1gw"
+	testValWoutTag = "065f5e3p0gk013cvyvm171gn9m"
+	testValWithTag = "065f5ef3q4k03p495rqw0g92sr"
 )
 
 func TestParseVarious(t *testing.T) {
-	_, err := Parse("0r2nbq0wqhjg186167t0gcd1gw")
+	//// time prefix types
+	// no tag
+	_, err := Parse("065f5e3p0gk013cvyvm171gn9m")
 	assert.NilError(t, err)
-	_, err = Parse("0r2nbq0wqhjg386167t0gcd1gw")
+	_, err = Parse("018af2b8760426008d9bf6e81386154d")
 	assert.NilError(t, err)
-	_, err = Parse("060639fff99b6b006e8377c0a1b18a1c")
+	_, err = Parse("AYryuHYEJgCNm_boE4YVTQ")
 	assert.NilError(t, err)
-	_, err = Parse("BgY6BiZo3gBH5QTfqiX0kA")
+	// with tag
+	_, err = Parse("065f5ef3q4k03p495rqw0g92sr")
 	assert.NilError(t, err)
+	_, err = Parse("018af2b9e3b92601d8892e2fc04122ce")
+	assert.NilError(t, err)
+	_, err = Parse("AYryueO5JgHYiS4vwEEizg")
+	assert.NilError(t, err)
+	//// random time prefix types
+	// no tag
+	_, err = Parse("sqpwgp85q3sg1jftqhyefasemc")
+	assert.NilError(t, err)
+	_, err = Parse("cdedc85905b8f300c9fabc7ce7ab2ea3")
+	assert.NilError(t, err)
+	_, err = Parse("ze3IWQW48wDJ-rx856suow")
+	assert.NilError(t, err)
+	// with tag
+	_, err = Parse("e02ddgb2zkyg3rmeza7jvwnn6g")
+	assert.NilError(t, err)
+	_, err = Parse("7004d6c162fcfd01e28efa8f2df2b534")
+	assert.NilError(t, err)
+	_, err = Parse("cATWwWL8_QHijvqPLfK1NA")
+	assert.NilError(t, err)
+
+	// bad ones
 	_, err = Parse("nope")
 	assert.Assert(t, err != nil, "expected to fail parsing invalid refid")
 	_, err = Parse("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz")
@@ -38,6 +62,61 @@ func TestParseVarious(t *testing.T) {
 	assert.Assert(t, err != nil, "expected to fail parsing invalid refid")
 	_, err = Parse("!!!!!!!!!!!!!!!!!!!!!!!!!!")
 	assert.Assert(t, err != nil, "expected to fail parsing invalid refid")
+
+	maxTime := time.UnixMilli(281474976710655)
+	minTime := time.UnixMilli(0)
+
+	// max value with type set to TimePrefix
+	x, err := Parse("zzzzzzzzzzzfzzzzzzzzzzzzzw")
+	assert.NilError(t, err)
+	assert.Assert(t, x.Tag() == 0xff)
+	assert.Assert(t, x.Time().Equal(maxTime))
+
+	// max value with type set to RandomPrefix
+	x, err = Parse("zzzzzzzzzzzzzzzzzzzzzzzzzw")
+	assert.NilError(t, err)
+	assert.Assert(t, x.Tag() == 0xff)
+	assert.Assert(t, x.Time().Equal(minTime))
+
+	// base32 padding at the end, so >w is truncated to w
+	// TimePrefix
+	x, err = Parse("zzzzzzzzzzzfzzzzzzzzzzzzzz")
+	assert.NilError(t, err)
+	assert.Assert(t, x.Tag() == 0xff)
+	assert.Assert(t, x.Time().Equal(maxTime))
+
+	// base32 padding at the end, so >w is truncated to w
+	// RandomPrefix
+	x, err = Parse("zzzzzzzzzzzzzzzzzzzzzzzzzz")
+	assert.NilError(t, err)
+	assert.Assert(t, x.Tag() == 0xff)
+	// RandomPrefix has zero time value
+	assert.Assert(t, x.Time().Equal(minTime))
+
+	// min value with type set to TimePrefix
+	x, err = Parse("00000000000000000000000000")
+	assert.NilError(t, err)
+	assert.Assert(t, x.Tag() == 0x00)
+	assert.Assert(t, x.Time().Equal(minTime))
+
+	val_max := [16]byte{}
+	val_min := [16]byte{}
+	for i := 0; i < 16; i++ {
+		val_max[i] = 0xff
+		val_min[i] = 0x00
+	}
+
+	x, err = FromBytes(val_max[:])
+	assert.NilError(t, err)
+	assert.Assert(t, x.Tag() == 0xff)
+	assert.Assert(t, x.Type() == RandomPrefix)
+	assert.Assert(t, x.Time().Equal(minTime))
+
+	x, err = FromBytes(val_min[:])
+	assert.NilError(t, err)
+	assert.Assert(t, x.Tag() == 0x00)
+	assert.Assert(t, x.Type() == TimePrefix)
+	assert.Assert(t, x.Time().Equal(minTime))
 }
 
 func TestGetTime(t *testing.T) {
@@ -50,7 +129,7 @@ func TestGetTime(t *testing.T) {
 	assert.Equal(t, t0, vz)
 
 	r2 := Must(Parse(testValWoutTag))
-	ts, _ := time.Parse(time.RFC3339, "2023-09-14T18:29:43.493733Z")
+	ts, _ := time.Parse(time.RFC3339, "2023-10-02T23:28:09.732Z")
 	assert.Equal(t, ts.UTC(), r2.Time().UTC())
 }
 
@@ -62,6 +141,12 @@ func TestSetTime(t *testing.T) {
 	r := Must(New())
 	r.SetTime(ts)
 	assert.Equal(t, ts.UTC(), r.Time().UTC())
+
+	r = Must(NewRandom())
+	// should error with random type
+	err := r.SetTime(ts)
+	assert.Assert(t, err != nil, "expected to error")
+	assert.Assert(t, r.Time().Equal(time.UnixMilli(0)))
 }
 
 func TestBase64RoundTrip(t *testing.T) {
@@ -69,7 +154,7 @@ func TestBase64RoundTrip(t *testing.T) {
 
 	r := Must(Parse(testValWithTag))
 	b64 := r.ToBase64String()
-	r2, err := FromBase64String(b64)
+	r2, err := Parse(b64)
 	assert.NilError(t, err)
 	assert.Equal(t, r.String(), r2.String())
 }
@@ -79,7 +164,7 @@ func TestHexRoundTrip(t *testing.T) {
 
 	r := Must(Parse(testValWithTag))
 	b64 := r.ToHexString()
-	r2, err := FromHexString(b64)
+	r2, err := Parse(b64)
 	assert.NilError(t, err)
 	assert.Equal(t, r.String(), r2.String())
 }
@@ -97,6 +182,18 @@ func TestRoundTrip(t *testing.T) {
 	assert.Check(t, u.HasTag(refTagTest))
 	assert.Check(t, r.HasTag(refTagTest))
 	assert.Equal(t, u.String(), r.String())
+
+	u = Must(NewRandom())
+	r = Must(Parse(u.String()))
+	assert.Check(t, !u.HasTag(refTagTest))
+	assert.Check(t, !r.HasTag(refTagTest))
+	assert.Equal(t, u.String(), r.String())
+
+	u = Must(NewRandomTagged(refTagTest))
+	r = Must(Parse(u.String()))
+	assert.Check(t, u.HasTag(refTagTest))
+	assert.Check(t, r.HasTag(refTagTest))
+	assert.Equal(t, u.String(), r.String())
 }
 
 func TestSetTag(t *testing.T) {
@@ -109,8 +206,8 @@ func TestSetTag(t *testing.T) {
 
 	r.SetTag(refTagTest)
 	assert.Check(t, r.HasTag(refTagTest))
-	assert.Equal(t, r.String(), testValWithTag)
-	assert.Equal(t, (&r).String(), testValWithTag)
+	assert.Equal(t, r.String(), "065f5e3p0gk033cvyvm171gn9m")
+	assert.Equal(t, (&r).String(), "065f5e3p0gk033cvyvm171gn9m")
 
 	r.ClearTag()
 	assert.Check(t, !r.HasTag(refTagTest))
@@ -119,11 +216,11 @@ func TestSetTag(t *testing.T) {
 
 	r2 := Must(Parse(testValWoutTag))
 	r2.SetTag(1)
-	assert.Equal(t, r2.ToHexString(), "060555dc1cbc6501a0c131f40831a187")
+	assert.Equal(t, r2.ToHexString(), "018af2b8760426018d9bf6e81386154d")
 	r2.ClearTag()
-	assert.Equal(t, r2.ToHexString(), "060555dc1cbc6500a0c131f40831a187")
+	assert.Equal(t, r2.ToHexString(), "018af2b8760426008d9bf6e81386154d")
 	r2.SetTag(2)
-	assert.Equal(t, r2.ToHexString(), "060555dc1cbc6502a0c131f40831a187")
+	assert.Equal(t, r2.ToHexString(), "018af2b8760426028d9bf6e81386154d")
 }
 
 func TestAmbiguous(t *testing.T) {

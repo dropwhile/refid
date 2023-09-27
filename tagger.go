@@ -13,16 +13,38 @@ func NewTagger(tag byte) Tagger {
 	return Tagger(tag)
 }
 
-// New generates a new RefID with tag set to the tag
+// New generates a new [TimePrefix] type [RefID] with tag set to the tag
 // of the [Tagger]
 func (t Tagger) New() (RefID, error) {
 	return NewTagged(byte(t))
 }
 
+// NewRandom generates a new [RandomPrefix] type [RefID] with tag set to the tag
+// of the [Tagger]
+func (t Tagger) NewRandom() (RefID, error) {
+	return NewRandomTagged(byte(t))
+}
+
 // Parse parses a [RefID], additionally enforcing that it is
-// is tagged with the same tag as the [Tagger]
+// tagged with the same tag as the [Tagger]
 func (t Tagger) Parse(s string) (RefID, error) {
-	return ParseTagged(byte(t), s)
+	return ParseWithRequire(s, HasTag(byte(t)))
+}
+
+// ParseWithRequire parses a textual RefID representation (same formats as
+// Parse), enforcing that it is tagged with the same tag as the [Tagger],
+// while additionally requiring each reqs [Requirement] to pass, and returns
+// a [RefID].
+//
+// Returns an error if RefID fails to parse, is not tagged with the same tag
+// as [Tagger],  or if any of the reqs Requirements fail.
+//
+// Example:
+//
+//	ParseWithRequire("afd661f4f2tg2vr3dca92qp6k8", HasType(RandomPrefix))
+func (t Tagger) ParseWithRequire(s string, reqs ...Requirement) (RefID, error) {
+	reqs = append(reqs, HasTag(byte(t)))
+	return ParseWithRequire(s, reqs...)
 }
 
 // HasTag reports whether a [RefID] is tagged with

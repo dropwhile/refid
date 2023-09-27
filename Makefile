@@ -48,6 +48,8 @@ Available targets:
 endef
 export HELP_OUTPUT
 
+export PATH := "${PATH}:${GOPATH}"
+
 .PHONY: help
 help:
 	@echo "$$HELP_OUTPUT"
@@ -57,7 +59,10 @@ clean:
 	@rm -rf "${BUILDDIR}"
 
 .PHONY: setup
-setup:
+setup: setup-build setup-check
+
+.PHONY: setup-build
+setup-build: ${GOPATH}/bin/stringer
 
 .PHONY: setup-check
 setup-check: ${GOPATH}/bin/staticcheck ${GOPATH}/bin/gosec ${GOPATH}/bin/govulncheck
@@ -75,7 +80,7 @@ ${GOPATH}/bin/stringer:
 	go install golang.org/x/tools/cmd/stringer@latest
 
 .PHONY: build 
-build: setup
+build: setup-build
 	@echo ">> Generating..."
 	@go generate ./...
 	@echo ">> Building..."
@@ -87,22 +92,22 @@ build: setup
 	@echo "done!"
 
 .PHONY: test 
-test: setup
+test:
 	@echo ">> Running tests..."
 	@go test -count=1 -vet=off ${GOTEST_FLAGS} ./...
 
 .PHONY: bench
-bench: setup
+bench:
 	@echo ">> Running benchmarks..."
 	@go test -bench="." -run="^$$" -test.benchmem=true ${GOTEST_BENCHFLAGS} ./...
 
 .PHONY: cover
-cover: setup
+cover:
 	@echo ">> Running tests with coverage..."
 	@go test -vet=off -cover ${GOTEST_FLAGS} ./...
 
 .PHONY: check
-check: setup setup-check
+check: setup-check
 	@echo ">> Running checks and validators..."
 	@echo "... staticcheck ..."
 	@${GOPATH}/bin/staticcheck ./...
