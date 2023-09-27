@@ -1,7 +1,7 @@
 github.com/coreos/go-systemd/v22 v22.5.0/go.mod h1:Y58oyj3AT4RCenI/lSvhwexgC+NSVTIJ3seZv2GcEnc=
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
-github.com/dropwhile/refid v0.0.0-20230926190006-120c0142020c h1:nD4y8hGo/1phkLbg47sW4Mg0372UA6HS5HnEruetyIc=
-github.com/dropwhile/refid v0.0.0-20230926190006-120c0142020c/go.mod h1:Apf1E46QKGLdL8rUQea++FtzUhai0Jo6Jz9oC0G0eWc=
+github.com/dropwhile/refid v1.0.0 h1:jiz4WM6q/0fLuFvPs76vraBT9VScG9pZXwKm9k3CXL4=
+github.com/dropwhile/refid v1.0.0/go.mod h1:Apf1E46QKGLdL8rUQea++FtzUhai0Jo6Jz9oC0G0eWc=
 github.com/godbus/dbus/v5 v5.0.4/go.mod h1:xhWf0FNVPg57R7Z0UbKHbJfkEywrmjJnf7w5xrFpKfA=
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
 github.com/google/go-cmp v0.5.9/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
