@@ -12,10 +12,10 @@ type AnyMatcher struct {
 }
 
 // Create a [AnyMatcher] matcher that matches that matches against a specific
-// Tag. Any valid RefIds that do not match the tag specified, will be considered
+// Tag. Any valid RefIDs that do not match the tag specified, will be considered
 // not matching.
 //
-// If tag is 0, will support matching any RefId (tag is then ignored)
+// If tag is 0, will support matching any RefID (tag is then ignored)
 //
 // Example usage:
 //
@@ -27,14 +27,14 @@ func MatchAny(tag byte) AnyMatcher {
 }
 
 func (a AnyMatcher) Match(v interface{}) bool {
-	var r RefId
+	var r RefID
 	var err error
 	switch x := v.(type) {
 	case string:
 		r, err = Parse(x)
 	case []byte:
 		r, err = FromBytes(x)
-	case RefId:
+	case RefID:
 		r = x
 	default:
 		return false

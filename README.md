@@ -1,4 +1,4 @@
-RefId
+RefID
 =====
 
 [![Build Status](https://github.com/dropwhile/refid/workflows/unit-tests/badge.svg)][1]
@@ -8,7 +8,7 @@ RefId
 
 ## About
 
-A RefId is a sortable unique identifier, similar to UUIDv7, with a few difference.
+A RefID is a sortable unique identifier, similar to UUIDv7, with a few difference.
 
 ```
  0                   1                   2                   3
@@ -89,7 +89,7 @@ rId2, err = refid.FromBase64String(s)
 // decode from hex
 rId2, err = refid.FromHexString(s)
 
-// get the time out of a RefId (as a time.Time)
+// get the time out of a RefID (as a time.Time)
 var ts time.Time = rId2.Time()
 ```
 
@@ -99,7 +99,7 @@ Simple tagging usage:
 ```go
 myTag := 2
 
-// generate a RefId with tag set to 1
+// generate a RefID with tag set to 1
 rId = refid.Must(refid.NewTagged(1))
 // you can also set it manually after generation
 rId.SetTag(myTag)
@@ -124,20 +124,20 @@ A hypothetical example is a refid url paramater for a type named "author", can b
 enforced as invalid when someone attempts to supply it as input for a different
 refid url parameter for a type named "book".
 
-Making tagging usage easier with RefIdTagger:
+Making tagging usage easier with RefIDTagger:
 ```go
-// AuthorRefId ensures it will only succesfully generate and parse tag=2 refids
-AuthorRefIdT := refid.RefIdTagger(2)
-// BookRefId ensures it will only succesfully generate and parse tag=3 refids
-BookRefIdT := refid.RefIdTagger(3)
+// AuthorRefID ensures it will only succesfully generate and parse tag=2 refids
+AuthorRefIDT := refid.RefIDTagger(2)
+// BookRefID ensures it will only succesfully generate and parse tag=3 refids
+BookRefIDT := refid.RefIDTagger(3)
 
-authorRefId := refid.Must(AuthorRefIdT.New()) // generated with a tag of 2
-authorRefId.HasTag(2) // true
-bookRefId := refid.Must(BookRefIdT.New()) // generated with a tag of 3
-bookRefId.HasTag(3) // true
+authorRefID := refid.Must(AuthorRefIDT.New()) // generated with a tag of 2
+authorRefID.HasTag(2) // true
+bookRefID := refid.Must(BookRefIDT.New()) // generated with a tag of 3
+bookRefID.HasTag(3) // true
 
-r, err := AuthorRefIdT.Parse(authorRefId.String()) // succeeds; err == nil
-r, err = bookRefId.Parse(authorRefId.String()) // fails; err != nil
+r, err := AuthorRefIDT.Parse(authorRefID.String()) // succeeds; err == nil
+r, err = bookRefID.Parse(authorRefID.String()) // fails; err != nil
 ```
 
 ## reftool command like utility

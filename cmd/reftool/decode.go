@@ -24,7 +24,7 @@ var decodeCmd = &cobra.Command{
 	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		refIdTxtLen := len(args[0])
-		var parseFunc func(string) (refid.RefId, error)
+		var parseFunc func(string) (refid.RefID, error)
 		switch refIdTxtLen {
 		case 0:
 			log.Fatal().Msg("no refid argument provided")

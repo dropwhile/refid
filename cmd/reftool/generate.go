@@ -35,7 +35,7 @@ var generateCmd = &cobra.Command{
 	Aliases: []string{"gen"},
 	Short:   "Generate a new refid and print the details",
 	Run: func(cmd *cobra.Command, args []string) {
-		var refId refid.RefId
+		var refId refid.RefID
 		if TagValue != 0 {
 			refId = refid.Must(refid.NewTagged(TagValue))
 		} else {
