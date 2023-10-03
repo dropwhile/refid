@@ -6,28 +6,29 @@ package refid
 
 import (
 	"crypto/rand"
+	"fmt"
 	"io"
 	"time"
 )
 
-func generateTimePrefixed() ([]byte, error) {
+func generate(t Type) ([]byte, error) {
 	b := make([]byte, size)
-	setTime(b, time.Now().UTC().UnixMilli())
-	err := setRandom(b[typeIndex:], rand.Reader)
+	var err error
+	switch t {
+	case TimePrefixed:
+		setTime(b, time.Now().UTC().UnixMilli())
+		err = setRandom(b[typeIndex:], rand.Reader)
+		// set type to 0 (clear lowest bit)
+		b[typeIndex] &^= 0x01
+	case RandomPrefixed:
+		err = setRandom(b, rand.Reader)
+		// set type to 1 (set bit 1)
+		b[typeIndex] |= 0x01
+	default:
+		return b, fmt.Errorf("unknown type specified")
+	}
 	// clear tag
 	b[tagIndex] = 0x00
-	// set type to 0 (clear lowest bit)
-	b[typeIndex] &^= 0x01
-	return b, err
-}
-
-func generateRandomPrefixed() ([]byte, error) {
-	b := make([]byte, size)
-	err := setRandom(b, rand.Reader)
-	// clear tag
-	b[tagIndex] = 0x00
-	// set type to 1 (set bit 1)
-	b[typeIndex] |= 0x01
 	return b, err
 }
 

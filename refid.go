@@ -40,7 +40,7 @@ type RefID [size]byte
 // If random bytes cannot be generated, it will return an error.
 func New() (RefID, error) {
 	var r RefID
-	b, err := generateTimePrefixed()
+	b, err := generate(TimePrefixed)
 	if err != nil {
 		return r, err
 	}
@@ -53,7 +53,7 @@ func New() (RefID, error) {
 // If random bytes cannot be generated, it will return an error.
 func NewRandom() (RefID, error) {
 	var r RefID
-	b, err := generateRandomPrefixed()
+	b, err := generate(RandomPrefixed)
 	if err != nil {
 		return r, err
 	}
