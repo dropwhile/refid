@@ -3,7 +3,7 @@ module github.com/dropwhile/refid/cmd/reftool
 go 1.21.1
 
 require (
-	github.com/dropwhile/refid v1.0.1
+	github.com/dropwhile/refid v1.0.2
 	github.com/rs/zerolog v1.31.0
 	github.com/spf13/cobra v1.7.0
 )
