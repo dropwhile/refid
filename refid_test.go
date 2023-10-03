@@ -229,9 +229,8 @@ func TestAmbiguous(t *testing.T) {
 	rd0 := Must(Parse(testValWoutTag))
 	rd1 := Must(Parse(testValWoutTag))
 	rd2 := Must(Parse(testValWoutTag))
-	assert.Assert(t,
-		rd0.String() == rd1.String() && rd1.String() == rd2.String(),
-	)
+	assert.Assert(t, rd0.String() == rd1.String() && rd1.String() == rd2.String())
+	assert.Assert(t, rd0.Equal(rd1) && rd1.Equal(rd2))
 }
 
 func TestTemplateStringer(t *testing.T) {

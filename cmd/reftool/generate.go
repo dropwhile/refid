@@ -20,14 +20,19 @@ var (
 )
 
 func init() {
-	generateCmd.Flags().Uint8VarP(&TagValue, "tag-value", "t", 0, "tag value")
-	generateCmd.Flags().StringVarP(&Only, "only", "o", "", "output only encoding result. optional argument: native, base64, hex")
-	generateCmd.Flags().BoolVarP(&Random, "random", "r", false, "generate a RefIdRandom instead of a standard type")
-	generateCmd.Flags().Lookup("only").NoOptDefVal = "native"
-	generateCmd.Flags().StringVarP(
-		&TimeAt, "when", "w", "",
-		"the date/time to use in the token, truncated to seconds resolution. Uses RFC3339 format",
-	)
+	generateCmd.Flags().
+		Uint8VarP(&TagValue, "tag-value", "t", 0, "tag value")
+	generateCmd.Flags().
+		StringVarP(&Only, "only", "o", "", "output only encoding result. optional argument: native, base64, hex")
+	generateCmd.Flags().
+		BoolVarP(&Random, "random", "r", false, "generate a RefIdRandom instead of a standard type")
+	generateCmd.Flags().
+		Lookup("only").NoOptDefVal = "native"
+	generateCmd.Flags().
+		StringVarP(
+			&TimeAt, "when", "w", "",
+			"the date/time to use in the token, truncated to seconds resolution. Uses RFC3339 format",
+		)
 	rootCmd.AddCommand(generateCmd)
 }
 

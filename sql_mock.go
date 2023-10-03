@@ -36,6 +36,8 @@ func (a AnyMatcher) Match(v interface{}) bool {
 		r, err = FromBytes(x)
 	case RefID:
 		r = x
+	case *RefID:
+		r = *x
 	default:
 		return false
 	}

@@ -209,13 +209,18 @@ func (r RefID) Type() Type {
 
 // IsNil reports if the [RefID] is the nil value RefID.
 func (r RefID) IsNil() bool {
-	return r == Nil
+	return r.Equal(Nil)
 }
 
 // Equal compares a [RefID] to another RefID to see
 // if they have the same underlying bytes.
 func (r RefID) Equal(other RefID) bool {
-	return r.String() == other.String()
+	for i := range r {
+		if r[i] != other[i] {
+			return false
+		}
+	}
+	return true
 }
 
 // Bytes returns a slice of a copy of the current [RefID] underlying data.
@@ -337,6 +342,13 @@ func (r *RefID) UnmarshalText(b []byte) error {
 }
 
 // MarshalBinary implements the [encoding.BinaryMarshaler] interface.
+//
+// Purposefully a value receiver for flexibility (from [EffectiveGo]):
+// "The rule about pointers vs. values for receivers is that value methods can
+// be invoked on pointers and values, but pointer methods can only be invoked on
+// pointers.""
+//
+// [EffectiveGo]: https://go.dev/doc/effective_go#methods
 func (r RefID) MarshalBinary() ([]byte, error) {
 	return r.Bytes(), nil
 }
@@ -353,6 +365,13 @@ func (r *RefID) UnmarshalBinary(data []byte) error {
 }
 
 // MarshalJson implements the [json.Marshaler] interface.
+//
+// Purposefully a value receiver for flexibility (from [EffectiveGo]):
+// "The rule about pointers vs. values for receivers is that value methods can
+// be invoked on pointers and values, but pointer methods can only be invoked on
+// pointers.""
+//
+// [EffectiveGo]: https://go.dev/doc/effective_go#methods
 func (r RefID) MarshalJSON() ([]byte, error) {
 	return json.Marshal(r.String())
 }

@@ -46,16 +46,17 @@ func (r RefID) Value() (driver.Value, error) {
 // a longer byte slice or a string will be handled by [RefID.UnmarshalText].
 func (r *RefID) Scan(src interface{}) error {
 	switch src := src.(type) {
-	case RefID: // support gorm convert from RefID to NullRefID
+	case RefID:
 		*r = src
 		return nil
-
+	case *RefID:
+		*r = *src
+		return nil
 	case []byte:
 		if len(src) == size {
 			return r.UnmarshalBinary(src)
 		}
 		return r.UnmarshalText(src)
-
 	case string:
 		switch len(src) {
 		case 26, 32, 22:

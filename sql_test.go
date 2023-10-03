@@ -71,7 +71,7 @@ func testSQLScanBinary(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got != codecTestRefID {
+	if !got.Equal(codecTestRefID) {
 		t.Errorf("Scan(%x): got %v, want %v", codecTestData, got, codecTestRefID)
 	}
 }
@@ -83,7 +83,7 @@ func testSQLScanString(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got != codecTestRefID {
+	if !got.Equal(codecTestRefID) {
 		t.Errorf("Scan(%q): got %v, want %v", s, got, codecTestRefID)
 	}
 }
@@ -95,7 +95,7 @@ func testSQLScanText(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got != codecTestRefID {
+	if !got.Equal(codecTestRefID) {
 		t.Errorf("Scan(%q): got %v, want %v", text, got, codecTestRefID)
 	}
 }
@@ -188,7 +188,7 @@ func testNullRefIDScanNil(t *testing.T) {
 	if u.Valid {
 		t.Error("NullRefID is valid after Scan(nil)")
 	}
-	if u.RefID != Nil {
+	if !u.RefID.Equal(Nil) {
 		t.Errorf("NullRefID.RefID is %v after Scan(nil) want Nil", u.RefID)
 	}
 }
@@ -203,7 +203,7 @@ func testNullRefIDScanValid(t *testing.T) {
 	if !u.Valid {
 		t.Errorf("Valid == false after Scan(%q)", s)
 	}
-	if u.RefID != codecTestRefID {
+	if !u.RefID.Equal(codecTestRefID) {
 		t.Errorf("RefID == %v after Scan(%q), want %v", u.RefID, s, codecTestRefID)
 	}
 }
@@ -217,7 +217,7 @@ func testNullRefIDScanRefID(t *testing.T) {
 	if !u.Valid {
 		t.Errorf("Valid == false after scan(%v)", codecTestRefID)
 	}
-	if u.RefID != codecTestRefID {
+	if !u.RefID.Equal(codecTestRefID) {
 		t.Errorf("RefID == %v after Scan(%v), want %v", u.RefID, codecTestRefID, codecTestRefID)
 	}
 }
@@ -281,7 +281,7 @@ func testNullRefIDUnmarshalJSONNil(t *testing.T) {
 		t.Fatalf("u.Valid = false, want true")
 	}
 
-	if u.RefID != Nil {
+	if !u.RefID.Equal(Nil) {
 		t.Fatalf("u.RefID = %v, want %v", u.RefID, Nil)
 	}
 }
@@ -299,7 +299,7 @@ func testNullRefIDUnmarshalJSONNull(t *testing.T) {
 		t.Fatalf("u.Valid = true, want false")
 	}
 
-	if u.RefID != Nil {
+	if !u.RefID.Equal(Nil) {
 		t.Fatalf("u.RefID = %v, want %v", u.RefID, Nil)
 	}
 }
@@ -317,7 +317,7 @@ func testNullRefIDUnmarshalJSONValid(t *testing.T) {
 		t.Fatalf("u.Valid = false, want true")
 	}
 
-	if u.RefID != codecTestRefID {
+	if !u.RefID.Equal(codecTestRefID) {
 		t.Fatalf("u.RefID = %v, want %v", u.RefID, Nil)
 	}
 }
