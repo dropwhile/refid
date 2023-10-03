@@ -33,7 +33,7 @@ func generateRandomPrefixed() ([]byte, error) {
 
 func setTime(b []byte, millis int64) {
 	ms := uint64(millis)
-	// A 56 bit timestamp of microseconds since epoch.
+	// A 56 bit timestamp of milliseconds since epoch.
 	// Which should result in about 2283 years worth of timestamps
 	// 1-7 bytes: big-endian unsigned number of Unix epoch timestamp
 	b[0] = byte(ms >> 40)

@@ -64,7 +64,7 @@ var generateCmd = &cobra.Command{
 			fmt.Printf("tag value:    %d\n", xID.Tag())
 			fmt.Printf("type:         %s\n", xID.Type())
 			fmt.Printf("time(string): %s\n", tx.Format(time.RFC3339Nano))
-			fmt.Printf("time(micros): %d\n", tx.UnixMicro())
+			fmt.Printf("time(millis): %d\n", tx.UnixMilli())
 		default:
 			fmt.Println(xID.String())
 		}

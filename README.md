@@ -73,7 +73,7 @@ General:
 *   similar to UUIDv7, with different tradeoffs
 
 TimePrefix:
-*   unix timestamp with microsecond precision
+*   unix timestamp with millisecond precision
 *   Compared to UUIDv7
     *   tagging support
     *   48 bits of Unix timestamp milliseconds from epoch (similar to UUIDv7)
@@ -205,7 +205,7 @@ base64 enc:   BgYjd4Lq7QUXXlHt1CaHjw
 tag value:    5
 type:         TimePrefixed
 time(string): 2023-09-24T23:47:38.954477Z
-time(micros): 1695599258954477
+time(millis): 1695599258954477
 
 # generate a refid with a tag of 5, and only output the native(base32) encoding
 % reftool generate -t 5 -o
@@ -227,7 +227,7 @@ base64 enc:   BfEohLb7AAJX-Jrsywtg5Q
 tag value:    2
 type:         TimePrefixed
 time(string): 2023-01-01T00:00:11.123456Z
-time(micros): 1672531211123456
+time(millis): 1672531211123456
 
 # decode a refid and display
 % reftool decode 0qrjh15pzc004nzrkbpcp2v0wm
@@ -237,7 +237,7 @@ base64 enc:   BfEohLb7AAJX-Jrsywtg5Q
 tag value:    2
 type:         TimePrefixed
 time(string): 2023-01-01T00:00:11.123456Z
-time(micros): 1672531211123456
+time(millis): 1672531211123456
 ```
 
 [1]: https://github.com/dropwhile/refid/actions

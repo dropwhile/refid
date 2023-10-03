@@ -16,10 +16,10 @@ func TestGenerateTime(t *testing.T) {
 	t.Parallel()
 
 	ts, _ := time.Parse(time.RFC3339, "2023-09-14T10:27:21.826305Z")
-	micros := ts.UTC().UnixMicro()
+	millis := ts.UTC().UnixMilli()
 
 	b := make([]byte, size)
-	setTime(b, micros)
+	setTime(b, millis)
 	assert.DeepEqual(t, b, []byte{
 		0x05, 0x4f, 0x1f, 0x0d,
 		0xf0, 0x01, 0x00, 0x00,
@@ -61,9 +61,9 @@ func TestGenerateBoth(t *testing.T) {
 	// use a seeded psuedorandom source for testing
 	r := rand.New(rand.NewSource(99))
 	ts, _ := time.Parse(time.RFC3339, "2023-09-14T10:27:21.826305Z")
-	micros := ts.UTC().UnixMicro()
+	millis := ts.UTC().UnixMilli()
 
-	setTime(b, micros)
+	setTime(b, millis)
 	err := setRandom(b, r)
 	assert.NilError(t, err)
 
