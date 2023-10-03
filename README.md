@@ -91,9 +91,8 @@ RandomPrefix:
 ## Non-Features
 
 *   refids, like UUIDs, do not internally perform any signature verification.
-    If the validity of the encoded timestamp and tag are required for any
-    secure operations, the refid SHOULD be externally verified before
-    parsing/decoding.  
+    If the validity of the encoded timestamp and tag are required for any secure
+    operations, the refid SHOULD be externally verified before parsing/decoding.  
     An example of this could be a wrapping encoder/decoder doing hmac signing and verification.
 
 ## Inspirations
@@ -113,10 +112,12 @@ go get -u github.com/dropwhile/refid
 
 ### Simple
 ```go
-// generate refid
+// generate a TimePrefixed RefID
 rID, err := refid.New()
-// generate refid (or panic)
+// generate a TimePrefixed RefID (or panic)
 rID = refid.Must(refid.New())
+// generate a RandomPrefixed RefID (or panic)
+rID = refid.Must(refid.NewRandom())
 
 // encoding...
 // encode to native encoding (base32 with Crockford alphabet)
@@ -136,7 +137,7 @@ rID, err = refid.FromBase64String(s)
 // decode from hex
 rID, err = refid.FromHexString(s)
 
-// get the time out of a RefID (as a time.Time)
+// get the time out of a TimePrefixed RefID (as a time.Time)
 var ts time.Time = rID.Time()
 ```
 
@@ -165,11 +166,12 @@ r, err = refid.ParseTagged(2, s) // err == nil here, as refid was tagged 2
 
 #### What use is tagging?
 
-Tag support ensures that a refid of a certain tag type can be made distinct from other refids -- those of a different tag type, or those with no tag type.  
+Tag support ensures that a refid of a certain tag type can be made distinct from
+other refids -- those of a different tag type, or those with no tag type.  
 
-A hypothetical example is a refid url paramater for a type named "author", can be
-enforced as invalid when someone attempts to supply it as input for a different
-refid url parameter for a type named "book".
+A hypothetical example is a refid url paramater for a type named "author", can
+be enforced as invalid when someone attempts to supply it as input for a
+different refid url parameter for a type named "book".
 
 Making tagging usage easier with RefIDTagger:
 ```go
