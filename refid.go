@@ -35,12 +35,12 @@ const (
 //   - multiple encodings supported: native (base32), base64, base16 (hex)
 type RefID [size]byte
 
-// New returns a new [TimePrefix] type [RefID].
+// New returns a new [TimePrefixed] type [RefID].
 //
 // If random bytes cannot be generated, it will return an error.
 func New() (RefID, error) {
 	var r RefID
-	b, err := generateTimePrefixType()
+	b, err := generateTimePrefixed()
 	if err != nil {
 		return r, err
 	}
@@ -48,12 +48,12 @@ func New() (RefID, error) {
 	return r, nil
 }
 
-// NewRandom returns a new [RandomPrefix] type [RefID].
+// NewRandom returns a new [RandomPrefixed] type [RefID].
 //
 // If random bytes cannot be generated, it will return an error.
 func NewRandom() (RefID, error) {
 	var r RefID
-	b, err := generateRandomPrefixType()
+	b, err := generateRandomPrefixed()
 	if err != nil {
 		return r, err
 	}
@@ -61,7 +61,7 @@ func NewRandom() (RefID, error) {
 	return r, nil
 }
 
-// NewTagged returns a new [TimePrefix] type [RefID] tagged with tag.
+// NewTagged returns a new [TimePrefixed] type [RefID] tagged with tag.
 //
 // If random bytes cannot be generated, it will return an error.
 func NewTagged(tag byte) (RefID, error) {
@@ -73,7 +73,7 @@ func NewTagged(tag byte) (RefID, error) {
 	return r, nil
 }
 
-// NewRandomTagged returns a new [RandomPrefix] type [RefID] tagged with tag.
+// NewRandomTagged returns a new [RandomPrefixed] type [RefID] tagged with tag.
 //
 // If random bytes cannot be generated, it will return an error.
 func NewRandomTagged(tag byte) (RefID, error) {
@@ -143,7 +143,7 @@ func FromString(s string) (RefID, error) {
 // specified by ts.
 func (r *RefID) SetTime(ts time.Time) error {
 	// if Radom type, do not set time, just return
-	if r.HasType(RandomPrefix) {
+	if r.HasType(RandomPrefixed) {
 		return fmt.Errorf("cant set time of RandomPrefix type")
 	}
 	setTime(r[:], ts.UTC().UnixMilli())
@@ -152,7 +152,7 @@ func (r *RefID) SetTime(ts time.Time) error {
 
 // Time returns the timestamp portion of a [RefID] as a [time.Time]
 func (r RefID) Time() time.Time {
-	if r.HasType(RandomPrefix) {
+	if r.HasType(RandomPrefixed) {
 		// if Random prefix, we have no time, so just
 		// return the zero time
 		return time.UnixMilli(0)

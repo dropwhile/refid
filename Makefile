@@ -25,6 +25,7 @@ CC_OUTPUT_TPL       := ${BUILDDIR}/bin/{{.Dir}}.{{.OS}}-{{.Arch}}
 
 # misc
 DOCKER_PREBUILD     ?=
+PATH 				:= "${PATH}:${GOPATH}/bin"
 
 # some exported vars (pre-configure go build behavior)
 export GO111MODULE=on
@@ -34,6 +35,7 @@ export GOEXPERIMENT=loopvar
 export GOOSE_DRIVER
 export GOOSE_DBSTRING
 export GOOSE_MIGRATION_DIR
+export PATH
 
 define HELP_OUTPUT
 Available targets:
@@ -48,7 +50,6 @@ Available targets:
 endef
 export HELP_OUTPUT
 
-export PATH := "${PATH}:${GOPATH}"
 
 .PHONY: help
 help:
@@ -82,7 +83,7 @@ ${GOPATH}/bin/stringer:
 .PHONY: build 
 build: setup-build
 	@echo ">> Generating..."
-	@go generate ./...
+	@PATH="${PATH}" go generate ./...
 	@echo ">> Building..."
 	@[ -d "${BUILDDIR}/bin" ] || mkdir -p "${BUILDDIR}/bin"
 	@(for x in ${CC_BUILD_TARGETS}; do \

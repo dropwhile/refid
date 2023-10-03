@@ -66,34 +66,34 @@ func TestParseVarious(t *testing.T) {
 	maxTime := time.UnixMilli(281474976710655)
 	minTime := time.UnixMilli(0)
 
-	// max value with type set to TimePrefix
+	// max value with type set to TimePrefixed
 	x, err := Parse("zzzzzzzzzzzfzzzzzzzzzzzzzw")
 	assert.NilError(t, err)
 	assert.Assert(t, x.Tag() == 0xff)
 	assert.Assert(t, x.Time().Equal(maxTime))
 
-	// max value with type set to RandomPrefix
+	// max value with type set to RandomPrefixed
 	x, err = Parse("zzzzzzzzzzzzzzzzzzzzzzzzzw")
 	assert.NilError(t, err)
 	assert.Assert(t, x.Tag() == 0xff)
 	assert.Assert(t, x.Time().Equal(minTime))
 
 	// base32 padding at the end, so >w is truncated to w
-	// TimePrefix
+	// TimePrefixed
 	x, err = Parse("zzzzzzzzzzzfzzzzzzzzzzzzzz")
 	assert.NilError(t, err)
 	assert.Assert(t, x.Tag() == 0xff)
 	assert.Assert(t, x.Time().Equal(maxTime))
 
 	// base32 padding at the end, so >w is truncated to w
-	// RandomPrefix
+	// RandomPrefixed
 	x, err = Parse("zzzzzzzzzzzzzzzzzzzzzzzzzz")
 	assert.NilError(t, err)
 	assert.Assert(t, x.Tag() == 0xff)
-	// RandomPrefix has zero time value
+	// RandomPrefixed has zero time value
 	assert.Assert(t, x.Time().Equal(minTime))
 
-	// min value with type set to TimePrefix
+	// min value with type set to TimePrefixed
 	x, err = Parse("00000000000000000000000000")
 	assert.NilError(t, err)
 	assert.Assert(t, x.Tag() == 0x00)
@@ -109,13 +109,13 @@ func TestParseVarious(t *testing.T) {
 	x, err = FromBytes(val_max[:])
 	assert.NilError(t, err)
 	assert.Assert(t, x.Tag() == 0xff)
-	assert.Assert(t, x.Type() == RandomPrefix)
+	assert.Assert(t, x.Type() == RandomPrefixed)
 	assert.Assert(t, x.Time().Equal(minTime))
 
 	x, err = FromBytes(val_min[:])
 	assert.NilError(t, err)
 	assert.Assert(t, x.Tag() == 0x00)
-	assert.Assert(t, x.Type() == TimePrefix)
+	assert.Assert(t, x.Type() == TimePrefixed)
 	assert.Assert(t, x.Time().Equal(minTime))
 }
 

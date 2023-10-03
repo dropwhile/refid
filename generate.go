@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func generateTimePrefixType() ([]byte, error) {
+func generateTimePrefixed() ([]byte, error) {
 	b := make([]byte, size)
 	setTime(b, time.Now().UTC().UnixMilli())
 	err := setRandom(b[typeIndex:], rand.Reader)
@@ -21,7 +21,7 @@ func generateTimePrefixType() ([]byte, error) {
 	return b, err
 }
 
-func generateRandomPrefixType() ([]byte, error) {
+func generateRandomPrefixed() ([]byte, error) {
 	b := make([]byte, size)
 	err := setRandom(b, rand.Reader)
 	// clear tag

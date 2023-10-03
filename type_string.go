@@ -8,13 +8,13 @@ func _() {
 	// An "invalid array index" compiler error signifies that the constant values have changed.
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
-	_ = x[TimePrefix-0]
-	_ = x[RandomPrefix-1]
+	_ = x[TimePrefixed-0]
+	_ = x[RandomPrefixed-1]
 }
 
-const _Type_name = "TimePrefixRandomPrefix"
+const _Type_name = "TimePrefixedRandomPrefixed"
 
-var _Type_index = [...]uint8{0, 10, 22}
+var _Type_index = [...]uint8{0, 12, 26}
 
 func (i Type) String() string {
 	if i >= Type(len(_Type_index)-1) {

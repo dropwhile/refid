@@ -11,47 +11,89 @@ RefID
 A RefID (short for Reference Identifier) is a sortable unique identifier,
 similar to UUIDv7, with a few difference.
 
+There are two types of RefIDs: TimePrefixed and RandomPrefixed.
+
+### TimePrefixed (type:0x00)
+
 ```
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                           unix_ts_µs                          |
+|                           unix_ts_ms                          |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                   unix_ts_µs                  |      tag      |
+|           unix_ts_ms          |    rand_a   |t|      tag      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                             rand_b                            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                             rand_b                            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+unix_ts_ms:
+    48 bits big-endian unsigned number of Unix epoch timestamp milliseconds.
+    (2284 years worth... until about year 4200 or so)
+rand_a:
+    7 bits random pad. fill with crypto/rand random.
+t:
+    1 bit for type. either RefId (type:0) or RefIdRand (type:1)
+tag:
+    8 bits tag. 255 separate tags (0 being untagged).
+rand_b:
+    64 bits random pad. fill with crypto/rand random.
+```
+
+### RandomPrefixed (type:0x01)
+
+```
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                             rand_a                            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    rand_a                   |t|      tag      |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                             rand_b                            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                             rand_b                            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-56 bits of unix_ts_µs:
-    microseconds since epoch - until about year 4200 or so
-8 bits tag:
-    255 separate tags (0 being untagged)
-64 bits random pad:
-    fill with crypto/rand random
+rand_a:
+    55 bits random pad. fill with crypto/rand random.
+t:
+    1 bit for type. either RefId (type:0) or RefIdRand (type:1)
+tag:
+    8 bits tag. 255 separate tags (0 being untagged).
+rand_b:
+    64 bits random pad. fill with crypto/rand random.
 ```
 
 ## Features
 
+General:
 *   tagging (support for 255 distinct tags)
-*   unix timestamp with microsecond precision
 *   supports go/sql scanner/valuer
 *   multiple encodings supported: native (base32), base64, base16 (hex)
 *   similar to UUIDv7, with different tradeoffs
-    *   tag support
-    *   slightly larger time section (56 vs 48 bits), resulting in microsecond
-        granularity instead of millisecond granularity. This also reduces the need
-        for "clock sequencing" support.
-    *   slightly smaller random section (64 vs 74 bits), though still good collision
-        resistance due to more granular time section
-    *   no UUID version field
-    *   not an rfc standard
+
+TimePrefix:
+*   unix timestamp with microsecond precision
+*   Compared to UUIDv7
+    *   tagging support
+    *   48 bits of Unix timestamp milliseconds from epoch (similar to UUIDv7)
+    *   slightly smaller random section (71 vs 74 bits), though still good
+        collision resistance
+    *   not a standard
+
+RandomPrefix:
+*   Compared to UUIDv7
+    *   tagging support
+    *   slightly smaller random section (119 vs 122 bits), though still good
+        collision resistance
+    *   not a standard
 
 ## Non-Features
 
 *   refids, like UUIDs, do not internally perform any signature verification.
-    If the validity of the encoded timestamp and tag are required for any secure
-    operations, the refid SHOULD be externally verified before parsing/decoding.
+    If the validity of the encoded timestamp and tag are required for any
+    secure operations, the refid SHOULD be externally verified before
+    parsing/decoding.  
     An example of this could be a wrapping encoder/decoder doing hmac signing and verification.
 
 ## Inspirations
@@ -159,6 +201,7 @@ native enc:   0r326xw2xbpga5tya7px89m7hw
 hex enc:      0606237782eaed05175e51edd426878f
 base64 enc:   BgYjd4Lq7QUXXlHt1CaHjw
 tag value:    5
+type:         TimePrefixed
 time(string): 2023-09-24T23:47:38.954477Z
 time(micros): 1695599258954477
 
@@ -180,6 +223,7 @@ native enc:   0qrjh15pzc004nzrkbpcp2v0wm
 hex enc:      05f12884b6fb000257f89aeccb0b60e5
 base64 enc:   BfEohLb7AAJX-Jrsywtg5Q
 tag value:    2
+type:         TimePrefixed
 time(string): 2023-01-01T00:00:11.123456Z
 time(micros): 1672531211123456
 
@@ -189,6 +233,7 @@ native enc:   0qrjh15pzc004nzrkbpcp2v0wm
 hex enc:      05f12884b6fb000257f89aeccb0b60e5
 base64 enc:   BfEohLb7AAJX-Jrsywtg5Q
 tag value:    2
+type:         TimePrefixed
 time(string): 2023-01-01T00:00:11.123456Z
 time(micros): 1672531211123456
 ```
