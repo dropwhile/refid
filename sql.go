@@ -78,6 +78,8 @@ type NullID struct {
 	Valid bool
 }
 
+type NullRefID = NullID
+
 // Value implements the [sql/driver.Valuer] interface.
 func (u NullID) Value() (driver.Value, error) {
 	if !u.Valid {
