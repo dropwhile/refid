@@ -1,4 +1,4 @@
-RefID
+refid
 =====
 
 [![Build Status](https://github.com/dropwhile/refid/workflows/unit-tests/badge.svg)][1]
@@ -8,10 +8,10 @@ RefID
 
 ## About
 
-A RefID (short for Reference Identifier) is a sortable unique identifier,
+A refid (short for Reference Identifier) is a unique identifier,
 similar to UUIDv7, with a few difference.
 
-There are two types of RefIDs: TimePrefixed and RandomPrefixed.
+There are two types of refids: TimePrefixed and RandomPrefixed.
 
 ### TimePrefixed (type:0x00)
 
@@ -33,7 +33,7 @@ unix_ts_ms:
 rand_a:
     7 bits random pad. fill with crypto/rand random.
 t:
-    1 bit for type. either RefId (type:0) or RefIdRand (type:1)
+    1 bit for type. TimePrefixed (type:0)
 tag:
     8 bits tag. 255 separate tags (0 being untagged).
 rand_b:
@@ -57,7 +57,7 @@ rand_b:
 rand_a:
     55 bits random pad. fill with crypto/rand random.
 t:
-    1 bit for type. either RefId (type:0) or RefIdRand (type:1)
+    1 bit for type. RandomPrefixed (type:1)
 tag:
     8 bits tag. 255 separate tags (0 being untagged).
 rand_b:
@@ -74,6 +74,7 @@ General:
 
 TimePrefix:
 *   unix timestamp with millisecond precision
+*   sortable, db index friendly
 *   Compared to UUIDv7
     *   tagging support
     *   48 bits of Unix timestamp milliseconds from epoch (similar to UUIDv7)
@@ -82,6 +83,7 @@ TimePrefix:
     *   not a standard
 
 RandomPrefix:
+*   not sortable, not db index friendly
 *   Compared to UUIDv7
     *   tagging support
     *   slightly smaller random section (119 vs 122 bits), though still good
@@ -112,11 +114,11 @@ go get -u github.com/dropwhile/refid
 
 ### Simple
 ```go
-// generate a TimePrefixed RefID
+// generate a TimePrefixed refid
 rID, err := refid.New()
-// generate a TimePrefixed RefID (or panic)
+// generate a TimePrefixed refid (or panic)
 rID = refid.Must(refid.New())
-// generate a RandomPrefixed RefID (or panic)
+// generate a RandomPrefixed refid (or panic)
 rID = refid.Must(refid.NewRandom())
 
 // encoding...
@@ -137,7 +139,7 @@ rID, err = refid.FromBase64String(s)
 // decode from hex
 rID, err = refid.FromHexString(s)
 
-// get the time out of a TimePrefixed RefID (as a time.Time)
+// get the time out of a TimePrefixed refid (as a time.Time)
 var ts time.Time = rID.Time()
 ```
 
@@ -147,7 +149,7 @@ Simple tagging usage:
 ```go
 myTag := 2
 
-// generate a RefID with tag set to 1
+// generate a refid with tag set to 1
 rID = refid.Must(refid.NewTagged(1))
 // you can also set it manually after generation
 rID.SetTag(myTag)
@@ -173,20 +175,20 @@ A hypothetical example is a refid url paramater for a type named "author", can
 be enforced as invalid when someone attempts to supply it as input for a
 different refid url parameter for a type named "book".
 
-Making tagging usage easier with RefIDTagger:
+Making tagging usage easier with refid.IDTagger:
 ```go
-// AuthorRefID ensures it will only succesfully generate and parse tag=2 refids
-AuthorRefIDT := refid.RefIDTagger(2)
-// BookRefID ensures it will only succesfully generate and parse tag=3 refids
-BookRefIDT := refid.RefIDTagger(3)
+// AuthorID ensures it will only succesfully generate and parse tag=2 refids
+AuthorIDT := refid.IDTagger(2)
+// BookID ensures it will only succesfully generate and parse tag=3 refids
+BookIDT := refid.IDTagger(3)
 
-authorRefID := refid.Must(AuthorRefIDT.New()) // generated with a tag of 2
-authorRefID.HasTag(2) // true
-bookRefID := refid.Must(BookRefIDT.New()) // generated with a tag of 3
-bookRefID.HasTag(3) // true
+authorID := refid.Must(AuthorIDT.New()) // generated with a tag of 2
+authorID.HasTag(2) // true
+bookID := refid.Must(BookIDT.New()) // generated with a tag of 3
+bookID.HasTag(3) // true
 
-r, err := AuthorRefIDT.Parse(authorRefID.String()) // succeeds; err == nil
-r, err = bookRefID.Parse(authorRefID.String()) // fails; err != nil
+r, err := AuthorIDT.Parse(authorID.String()) // succeeds; err == nil
+r, err = bookIDT.Parse(authorID.String()) // fails; err != nil
 ```
 
 ## reftool command like utility
@@ -197,7 +199,7 @@ go install github.com/dropwhile/refid/cmd/reftool@latest
 ```
 
 ```
-# generate a refid with a tag of 5
+# generate a refi.ID with a tag of 5
 % reftool generate -t 5
 native enc:   0r326xw2xbpga5tya7px89m7hw
 hex enc:      0606237782eaed05175e51edd426878f

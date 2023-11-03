@@ -32,24 +32,24 @@ import (
 )
 
 var (
-	_ driver.Valuer = RefID{}
-	_ sql.Scanner   = (*RefID)(nil)
+	_ driver.Valuer = ID{}
+	_ sql.Scanner   = (*ID)(nil)
 )
 
 // Value implements the [sql/driver.Valuer] interface.
-func (r RefID) Value() (driver.Value, error) {
+func (r ID) Value() (driver.Value, error) {
 	return r.Bytes(), nil
 }
 
 // Scan implements the [sql.Scanner] interface.
-// A 16-byte slice will be handled by [RefID.UnmarshalBinary], while
-// a longer byte slice or a string will be handled by [RefID.UnmarshalText].
-func (r *RefID) Scan(src interface{}) error {
+// A 16-byte slice will be handled by [ID.UnmarshalBinary], while
+// a longer byte slice or a string will be handled by [ID.UnmarshalText].
+func (r *ID) Scan(src interface{}) error {
 	switch src := src.(type) {
-	case RefID:
+	case ID:
 		*r = src
 		return nil
-	case *RefID:
+	case *ID:
 		*r = *src
 		return nil
 	case []byte:
@@ -62,62 +62,62 @@ func (r *RefID) Scan(src interface{}) error {
 		case 26, 32, 22:
 			// ok
 		default:
-			return fmt.Errorf("refid: cannot convert %T to RefID", src)
+			return fmt.Errorf("refid: cannot convert %T to ID", src)
 		}
 		err := r.UnmarshalText([]byte(src))
 		return err
 	}
 
-	return fmt.Errorf("refid: cannot convert %T to RefID", src)
+	return fmt.Errorf("refid: cannot convert %T to ID", src)
 }
 
-// NullRefID can be used with the standard sql package to represent a
-// [RefID] value that can be NULL in the database.
-type NullRefID struct {
-	RefID RefID
+// NullID can be used with the standard sql package to represent a
+// [ID] value that can be NULL in the database.
+type NullID struct {
+	ID    ID
 	Valid bool
 }
 
 // Value implements the [sql/driver.Valuer] interface.
-func (u NullRefID) Value() (driver.Value, error) {
+func (u NullID) Value() (driver.Value, error) {
 	if !u.Valid {
 		return nil, nil
 	}
-	return u.RefID.Value()
+	return u.ID.Value()
 }
 
 // Scan implements the [sql.Scanner] interface.
-func (u *NullRefID) Scan(src interface{}) error {
+func (u *NullID) Scan(src interface{}) error {
 	if src == nil {
-		u.RefID, u.Valid = Nil, false
+		u.ID, u.Valid = Nil, false
 		return nil
 	}
 
 	u.Valid = true
-	return u.RefID.Scan(src)
+	return u.ID.Scan(src)
 }
 
 var nullJSON = []byte("null")
 
-// MarshalJSON marshals the [NullRefID] as null or the nested [RefID]
-func (u NullRefID) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals the [NullID] as null or the nested [ID]
+func (u NullID) MarshalJSON() ([]byte, error) {
 	if !u.Valid {
 		return nullJSON, nil
 	}
-	return json.Marshal(u.RefID.String())
+	return json.Marshal(u.ID.String())
 }
 
-// UnmarshalJSON unmarshals a [NullRefID]
-func (u *NullRefID) UnmarshalJSON(b []byte) error {
+// UnmarshalJSON unmarshals a [NullID]
+func (u *NullID) UnmarshalJSON(b []byte) error {
 	if string(b) == "null" || string(b) == "00000000000000000000000000" {
-		u.RefID, u.Valid = Nil, false
+		u.ID, u.Valid = Nil, false
 		return nil
 	}
 	var s string
 	if err := json.Unmarshal(b, &s); err != nil {
 		return err
 	}
-	err := u.RefID.UnmarshalText([]byte(s))
+	err := u.ID.UnmarshalText([]byte(s))
 	u.Valid = (err == nil)
 	return err
 }

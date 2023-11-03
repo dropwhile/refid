@@ -257,7 +257,7 @@ func TestJsonUnmarshal(t *testing.T) {
 	t.Parallel()
 
 	data := fmt.Sprintf("%q", testValWoutTag)
-	var r RefID
+	var r ID
 	err := json.Unmarshal([]byte(data), &r)
 	assert.NilError(t, err)
 	assert.Equal(t, r.String(), testValWoutTag)

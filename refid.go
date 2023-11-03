@@ -19,8 +19,8 @@ var (
 	// ref: https://en.wikipedia.org/wiki/Base32#Crockford's_Base32
 	alphabet      = "0123456789abcdefghjkmnpqrstvwxyz"
 	base32Encoder = base32.NewEncoding(alphabet).WithPadding(base32.NoPadding)
-	// Nil is the nil RefID, that has all 128 bits set to zero.
-	Nil = RefID{}
+	// Nil is the nil ID, that has all 128 bits set to zero.
+	Nil = ID{}
 )
 
 const (
@@ -29,17 +29,20 @@ const (
 	tagIndex  = 7  // offset where tag starts
 )
 
-// A RefID is a 16 byte identifier that has:
+// A ID is a 16 byte identifier that has:
 //   - tagging support (support for 255 distinct tag types)
 //   - go/sql scanner/valuer support
 //   - multiple encodings supported: native (base32), base64, base16 (hex)
-type RefID [size]byte
+type ID [size]byte
 
-// New returns a new [TimePrefixed] type [RefID].
+// Alias for backwards compat
+type RefID = ID
+
+// New returns a new [TimePrefixed] type [ID].
 //
 // If random bytes cannot be generated, it will return an error.
-func New() (RefID, error) {
-	var r RefID
+func New() (ID, error) {
+	var r ID
 	b, err := generate(TimePrefixed)
 	if err != nil {
 		return r, err
@@ -48,23 +51,10 @@ func New() (RefID, error) {
 	return r, nil
 }
 
-// NewRandom returns a new [RandomPrefixed] type [RefID].
+// NewTagged returns a new [TimePrefixed] type [ID] tagged with tag.
 //
 // If random bytes cannot be generated, it will return an error.
-func NewRandom() (RefID, error) {
-	var r RefID
-	b, err := generate(RandomPrefixed)
-	if err != nil {
-		return r, err
-	}
-	copy(r[:], b[:])
-	return r, nil
-}
-
-// NewTagged returns a new [TimePrefixed] type [RefID] tagged with tag.
-//
-// If random bytes cannot be generated, it will return an error.
-func NewTagged(tag byte) (RefID, error) {
+func NewTagged(tag byte) (ID, error) {
 	r, err := New()
 	if err != nil {
 		return r, err
@@ -73,10 +63,23 @@ func NewTagged(tag byte) (RefID, error) {
 	return r, nil
 }
 
-// NewRandomTagged returns a new [RandomPrefixed] type [RefID] tagged with tag.
+// NewRandom returns a new [RandomPrefixed] type [ID].
 //
 // If random bytes cannot be generated, it will return an error.
-func NewRandomTagged(tag byte) (RefID, error) {
+func NewRandom() (ID, error) {
+	var r ID
+	b, err := generate(RandomPrefixed)
+	if err != nil {
+		return r, err
+	}
+	copy(r[:], b[:])
+	return r, nil
+}
+
+// NewRandomTagged returns a new [RandomPrefixed] type [ID] tagged with tag.
+//
+// If random bytes cannot be generated, it will return an error.
+func NewRandomTagged(tag byte) (ID, error) {
 	r, err := NewRandom()
 	if err != nil {
 		return r, err
@@ -85,32 +88,32 @@ func NewRandomTagged(tag byte) (RefID, error) {
 	return r, nil
 }
 
-// Parse parses a textual RefID representation, and returns
-// a [RefID]. Supports parsing the following text formats:
+// Parse parses a textual ID representation, and returns
+// a [ID]. Supports parsing the following text formats:
 //
 //   - native/base32 (Crockford's alphabet)
 //   - base64
 //   - base16/hex
 //
 // Will return an error on parse failure.
-func Parse(s string) (RefID, error) {
-	var r RefID
+func Parse(s string) (ID, error) {
+	var r ID
 	err := r.UnmarshalText([]byte(s))
 	return r, err
 }
 
-// ParseWithRequire parses a textual RefID representation
+// ParseWithRequire parses a textual ID representation
 // (same formats as Parse), while additionally requiring
 // each reqs [Requirement] to pass, and returns
-// a [RefID].
+// a [ID].
 //
-// Returns an error if RefID fails to parse or if any of the
+// Returns an error if ID fails to parse or if any of the
 // reqs Requirements fail.
 //
 // Example:
 //
 //	ParseWithRequire("afd661f4f2tg2vr3dca92qp6k8", HasType(RandomPrefix))
-func ParseWithRequire(s string, reqs ...Requirement) (RefID, error) {
+func ParseWithRequire(s string, reqs ...Requirement) (ID, error) {
 	r, err := Parse(s)
 	if err != nil {
 		return r, err
@@ -125,23 +128,23 @@ func ParseWithRequire(s string, reqs ...Requirement) (RefID, error) {
 	return r, nil
 }
 
-// FromBytes creates a new [RefID] from a byte slice.
+// FromBytes creates a new [ID] from a byte slice.
 // Returns an error if the slice does not have a length of 16.
 // The bytes are copied from the slice.
-func FromBytes(input []byte) (RefID, error) {
-	var r RefID
+func FromBytes(input []byte) (ID, error) {
+	var r ID
 	err := r.UnmarshalBinary(input)
 	return r, err
 }
 
 // FromString is an alias of [Parse].
-func FromString(s string) (RefID, error) {
+func FromString(s string) (ID, error) {
 	return Parse(s)
 }
 
-// SetTime sets the time component of a RefID to the time
+// SetTime sets the time component of a ID to the time
 // specified by ts.
-func (r *RefID) SetTime(ts time.Time) error {
+func (r *ID) SetTime(ts time.Time) error {
 	// if Radom type, do not set time, just return
 	if r.HasType(RandomPrefixed) {
 		return fmt.Errorf("cant set time of RandomPrefix type")
@@ -150,8 +153,8 @@ func (r *RefID) SetTime(ts time.Time) error {
 	return nil
 }
 
-// Time returns the timestamp portion of a [RefID] as a [time.Time]
-func (r RefID) Time() time.Time {
+// Time returns the timestamp portion of a [ID] as a [time.Time]
+func (r ID) Time() time.Time {
 	if r.HasType(RandomPrefixed) {
 		// if Random prefix, we have no time, so just
 		// return the zero time
@@ -168,53 +171,53 @@ func (r RefID) Time() time.Time {
 	return time.UnixMilli(t).UTC()
 }
 
-// SetTag sets the [RefID] tag to the specified value.
-func (r *RefID) SetTag(tag byte) *RefID {
+// SetTag sets the [ID] tag to the specified value.
+func (r *ID) SetTag(tag byte) *ID {
 	r[tagIndex] = tag
 	return r
 }
 
-// ClearTag clears the [RefID] tag.
-func (r *RefID) ClearTag() *RefID {
+// ClearTag clears the [ID] tag.
+func (r *ID) ClearTag() *ID {
 	r[tagIndex] = 0
 	return r
 }
 
-// IsTagged reports whether the [RefID] is tagged.
-func (r RefID) IsTagged() bool {
+// IsTagged reports whether the [ID] is tagged.
+func (r ID) IsTagged() bool {
 	return r[tagIndex] != 0
 }
 
-// IsTagged reports whether the [RefID] is tagged and
+// IsTagged reports whether the [ID] is tagged and
 // if so, if it is tagged with tag.
-func (r RefID) HasTag(tag byte) bool {
+func (r ID) HasTag(tag byte) bool {
 	return (r.IsTagged() && r[tagIndex] == tag)
 }
 
-// Tag returns the current tag of the RefID.
-// If the [RefID] is untagged, it will retrun 0.
-func (r RefID) Tag() byte {
+// Tag returns the current tag of the ID.
+// If the [ID] is untagged, it will retrun 0.
+func (r ID) Tag() byte {
 	return r[tagIndex]
 }
 
 // HasType reports whether the [RefId] is of type t.
-func (r RefID) HasType(t Type) bool {
+func (r ID) HasType(t Type) bool {
 	return r[typeIndex]&0x01 == byte(t)
 }
 
-// Type returns the type of the RefID.
-func (r RefID) Type() Type {
+// Type returns the type of the ID.
+func (r ID) Type() Type {
 	return Type(r[typeIndex] & 0x01)
 }
 
-// IsNil reports if the [RefID] is the nil value RefID.
-func (r RefID) IsNil() bool {
+// IsNil reports if the [ID] is the nil value ID.
+func (r ID) IsNil() bool {
 	return r.Equal(Nil)
 }
 
-// Equal compares a [RefID] to another RefID to see
+// Equal compares a [ID] to another ID to see
 // if they have the same underlying bytes.
-func (r RefID) Equal(other RefID) bool {
+func (r ID) Equal(other ID) bool {
 	for i := range r {
 		if r[i] != other[i] {
 			return false
@@ -223,41 +226,41 @@ func (r RefID) Equal(other RefID) bool {
 	return true
 }
 
-// Bytes returns a slice of a copy of the current [RefID] underlying data.
-func (r RefID) Bytes() []byte {
+// Bytes returns a slice of a copy of the current [ID] underlying data.
+func (r ID) Bytes() []byte {
 	b := make([]byte, size)
 	copy(b[:], r[:])
 	return b
 }
 
 // String returns the native (base32 w/Crockford alphabet) textual represenation
-// of a [RefID]
-func (r RefID) String() string {
+// of a [ID]
+func (r ID) String() string {
 	return base32Encoder.EncodeToString(r[:])
 }
 
 // ToString is an alias of [String]
-func (r RefID) ToString() string {
+func (r ID) ToString() string {
 	return r.String()
 }
 
 // ToBase32String is an alias of [String]
-func (r RefID) ToBase32String() string {
+func (r ID) ToBase32String() string {
 	return r.String()
 }
 
-// String returns the base64 textual represenation of a [RefID]
-func (r RefID) ToBase64String() string {
+// String returns the base64 textual represenation of a [ID]
+func (r ID) ToBase64String() string {
 	return base64.RawURLEncoding.EncodeToString(r[:])
 }
 
-// String returns the base16/hex textual represenation of a [RefID]
-func (r RefID) ToHexString() string {
+// String returns the base16/hex textual represenation of a [ID]
+func (r ID) ToHexString() string {
 	return hex.EncodeToString(r[:])
 }
 
 // Format implements the [fmt.Formatter] interface.
-func (r RefID) Format(f fmt.State, c rune) {
+func (r ID) Format(f fmt.State, c rune) {
 	if c == 'v' && f.Flag('#') {
 		fmt.Fprintf(f, "%#v", r.Bytes())
 		return
@@ -282,18 +285,18 @@ func (r RefID) Format(f fmt.State, c rune) {
 		_, _ = f.Write([]byte{'"'})
 	default:
 		// invalid/unsupported format verb
-		fmt.Fprintf(f, "%%!%c(refid.RefID=%s)", c, r.String())
+		fmt.Fprintf(f, "%%!%c(refid.ID=%s)", c, r.String())
 	}
 }
 
 // MarshalText implements the [encoding.TextMarshaler] interface.
-func (r RefID) MarshalText() ([]byte, error) {
+func (r ID) MarshalText() ([]byte, error) {
 	return []byte(r.String()), nil
 }
 
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 // It will return an error if the slice isn't of appropriate size.
-func (r *RefID) UnmarshalText(b []byte) error {
+func (r *ID) UnmarshalText(b []byte) error {
 	bx := make([]byte, size)
 	switch len(b) {
 	case 26: // native
@@ -349,16 +352,16 @@ func (r *RefID) UnmarshalText(b []byte) error {
 // pointers.""
 //
 // [EffectiveGo]: https://go.dev/doc/effective_go#methods
-func (r RefID) MarshalBinary() ([]byte, error) {
+func (r ID) MarshalBinary() ([]byte, error) {
 	return r.Bytes(), nil
 }
 
 // UnmarshalBinary implements the [encoding.BinaryUnmarshaler] interface.
 // It will return an error if the slice isn't of appropriate size.
-func (r *RefID) UnmarshalBinary(data []byte) error {
+func (r *ID) UnmarshalBinary(data []byte) error {
 	dlen := len(data)
 	if dlen != size {
-		return fmt.Errorf("refid: RefID must be exactly %d bytes long, got %d bytes", size, dlen)
+		return fmt.Errorf("refid: ID must be exactly %d bytes long, got %d bytes", size, dlen)
 	}
 	copy(r[:], data[:])
 	return nil
@@ -372,12 +375,12 @@ func (r *RefID) UnmarshalBinary(data []byte) error {
 // pointers.""
 //
 // [EffectiveGo]: https://go.dev/doc/effective_go#methods
-func (r RefID) MarshalJSON() ([]byte, error) {
+func (r ID) MarshalJSON() ([]byte, error) {
 	return json.Marshal(r.String())
 }
 
 // UnmarshalJson implements the [json.Unmarshaler] interface.
-func (r *RefID) UnmarshalJSON(b []byte) error {
+func (r *ID) UnmarshalJSON(b []byte) error {
 	var s string
 	if err := json.Unmarshal(b, &s); err != nil {
 		return err

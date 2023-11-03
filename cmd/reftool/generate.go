@@ -31,7 +31,7 @@ func (cmd *GenerateCmd) Run() error {
 	}
 
 	if cmd.When != nil {
-		xID.SetTime(*cmd.When)
+		_ = xID.SetTime(*cmd.When)
 	}
 
 	switch cmd.Only {
