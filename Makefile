@@ -80,10 +80,13 @@ ${GOPATH}/bin/govulncheck:
 ${GOPATH}/bin/stringer:
 	go install golang.org/x/tools/cmd/stringer@latest
 
-.PHONY: build 
-build: setup-build
+.PHONY: generate
+generate: setup-build
 	@echo ">> Generating..."
 	@PATH="${PATH}" go generate ./...
+
+.PHONY: build
+build: setup-build
 	@echo ">> Building..."
 	@[ -d "${BUILDDIR}/bin" ] || mkdir -p "${BUILDDIR}/bin"
 	@(for x in ${CC_BUILD_TARGETS}; do \
@@ -92,7 +95,7 @@ build: setup-build
 	done)
 	@echo "done!"
 
-.PHONY: test 
+.PHONY: test
 test:
 	@echo ">> Running tests..."
 	@go test -count=1 -vet=off ${GOTEST_FLAGS} ./...
@@ -115,7 +118,7 @@ check: setup-check
 	@echo "... go-vet ..."
 	@go vet ./...
 	@echo "... gosec ..."
-	@${GOPATH}/bin/gosec -quiet ./...
+	@${GOPATH}/bin/gosec -quiet -exclude-dir=tool ./...
 	@echo "... govulncheck ..."
 	@${GOPATH}/bin/govulncheck ./...
 
