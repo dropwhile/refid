@@ -4,6 +4,47 @@
 
 package main
 
+import (
+	"os"
+
+	"github.com/alecthomas/kong"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+)
+
+type verboseFlag bool
+
+func (v verboseFlag) BeforeApply() error {
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	log.Debug().Msg("debug logging enabled")
+	return nil
+}
+
+type CLI struct {
+	// global options
+	Verbose verboseFlag      `name:"verbose" short:"v" help:"enable verbose logging"`
+	Version kong.VersionFlag `name:"version" short:"V" help:"Print version information and quit"`
+
+	// subcommands
+	Generate GenerateCmd `cmd:"" aliases:"gen" help:"Generate a new refid and print the details"`
+	Decode   DecodeCmd   `cmd:"" aliases:"parse" help:"Decode and print the details of a refid"`
+}
+
 func main() {
-	Execute()
+	log.Logger = log.Output(zerolog.ConsoleWriter{
+		Out:          os.Stderr,
+		PartsExclude: []string{zerolog.TimestampFieldName},
+	})
+
+	cli := CLI{}
+	ctx := kong.Parse(&cli,
+		kong.Name("reftool"),
+		kong.Description("A tool for working with refids"),
+		kong.UsageOnError(),
+		kong.Vars{
+			"version": "0.0.1",
+		},
+	)
+	err := ctx.Run(&cli)
+	ctx.FatalIfErrorf(err)
 }
