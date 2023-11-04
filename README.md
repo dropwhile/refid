@@ -210,15 +210,15 @@ time(string): 2023-09-24T23:47:38.954477Z
 time(millis): 1695599258954477
 
 # generate a refid with a tag of 5, and only output the native(base32) encoding
-% reftool generate -t 5 -o
+% reftool generate -t 5 -o native
 0r34ky6h51r012an8skhbsvxt0
 
 # generate a refid with a tag of 5, and only output the hex encoding
-% reftool generate -t 5 -o=hex
+% reftool generate -t 5 -o hex
 060649f82794f10039169e91d0696763
 
 # generate a refid with a tag of 5, and only output the base64 encoding
-% reftool generate -o=base64
+% reftool generate -o base64
 BgZJ-i1F2wALdZFJrWvNzA
 
 # genrate a refid with a tag of 2, at a specific timestamp
