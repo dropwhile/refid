@@ -8,6 +8,7 @@ GOVER               := $(shell go version | awk '{print $$3}' | tr -d '.')
 APP_VER             := $(shell git describe --always --tags|sed 's/^v//')
 GITHASH             := $(shell git rev-parse --short HEAD)
 GOPATH              := $(shell go env GOPATH)
+GOBIN               := ${GOPATH}/bin
 VERSION_VAR         := main.ServerVersion
 
 # flags and build configuration
@@ -59,26 +60,39 @@ help:
 clean:
 	@rm -rf "${BUILDDIR}"
 
-.PHONY: setup
-setup: setup-build setup-check
+${GOBIN}/stringer:
+	go install golang.org/x/tools/cmd/stringer@latest
 
-.PHONY: setup-build
-setup-build: ${GOPATH}/bin/stringer
-
-.PHONY: setup-check
-setup-check: ${GOPATH}/bin/staticcheck ${GOPATH}/bin/gosec ${GOPATH}/bin/govulncheck
-
-${GOPATH}/bin/staticcheck:
+${GOBIN}/staticcheck:
 	go install honnef.co/go/tools/cmd/staticcheck@latest
 
-${GOPATH}/bin/gosec:
+${GOBIN}/gosec:
 	go install github.com/securego/gosec/v2/cmd/gosec@latest
 
-${GOPATH}/bin/govulncheck:
+${GOBIN}/govulncheck:
 	go install golang.org/x/vuln/cmd/govulncheck@latest
 
-${GOPATH}/bin/stringer:
-	go install golang.org/x/tools/cmd/stringer@latest
+${GOBIN}/errcheck:
+	go install github.com/kisielk/errcheck@latest
+
+${GOBIN}/ineffassign:
+	go install github.com/gordonklaus/ineffassign@latest
+
+${GOBIN}/nilaway:
+	go install go.uber.org/nilaway/cmd/nilaway@latest
+
+BUILD_TOOLS := ${GOBIN}/stringer
+CHECK_TOOLS := ${GOBIN}/staticcheck ${GOBIN}/gosec ${GOBIN}/govulncheck
+CHECK_TOOLS += ${GOBIN}/errcheck ${GOBIN}/ineffassign ${GOBIN}/nilaway
+
+.PHONY: setup
+setup:
+
+.PHONY: setup-build
+setup-build: setup ${BUILD_TOOLS}
+
+.PHONY: setup-check
+setup-check: setup ${CHECK_TOOLS}
 
 .PHONY: generate
 generate: setup-build
@@ -96,17 +110,17 @@ build: setup-build
 	@echo "done!"
 
 .PHONY: test
-test:
+test: setup
 	@echo ">> Running tests..."
 	@go test -count=1 -vet=off ${GOTEST_FLAGS} ./...
 
 .PHONY: bench
-bench:
+bench: setup
 	@echo ">> Running benchmarks..."
 	@go test -bench="." -run="^$$" -test.benchmem=true ${GOTEST_BENCHFLAGS} ./...
 
 .PHONY: cover
-cover:
+cover: setup
 	@echo ">> Running tests with coverage..."
 	@go test -vet=off -cover ${GOTEST_FLAGS} ./...
 
@@ -114,16 +128,19 @@ cover:
 check: setup-check
 	@echo ">> Running checks and validators..."
 	@echo "... staticcheck ..."
-	@${GOPATH}/bin/staticcheck ./...
+	@${GOBIN}/staticcheck ./...
+	@echo "... errcheck ..."
+	@${GOBIN}/errcheck -ignoretests -exclude .errcheck-excludes.txt ./...
 	@echo "... go-vet ..."
 	@go vet ./...
 	@echo "... gosec ..."
-	@${GOPATH}/bin/gosec -quiet -exclude-dir=tool ./...
+	@${GOBIN}/gosec -quiet -exclude-dir=tool ./...
+	@echo "... ineffassign ..."
+	@${GOBIN}/ineffassign ./...
 	@echo "... govulncheck ..."
-	@${GOPATH}/bin/govulncheck ./...
 
 .PHONY: update-go-deps
-update-go-deps:
+update-go-deps: setup
 	@echo ">> updating Go dependencies..."
 	@go get -u all
 	@go mod tidy
