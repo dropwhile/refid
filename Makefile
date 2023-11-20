@@ -47,7 +47,9 @@ Available targets:
   test                run tests
   cover               run tests with cover output
   bench               run benchmarks
+  generate            run go:generate
   build               build all binaries
+  update-go-deps      updates go.mod and go.sum files
 endef
 export HELP_OUTPUT
 
