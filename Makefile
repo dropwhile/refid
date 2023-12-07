@@ -5,7 +5,7 @@ OS                  := $(shell go env GOHOSTOS)
 GOVER               := $(shell go version | awk '{print $$3}' | tr -d '.')
 
 # app specific info
-APP_VER             := $(shell git describe --always --tags|sed 's/^v//')
+APP_VER             := v$(shell git describe --always --tags|sed 's/^v//')
 GITHASH             := $(shell git rev-parse --short HEAD)
 GOPATH              := $(shell go env GOPATH)
 GOBIN               := ${GOPATH}/bin
