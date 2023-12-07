@@ -284,7 +284,19 @@ tag value:    2
 type:         TimePrefixed
 time(string): 2023-01-01T00:00:11.123456Z
 time(millis): 1672531211123456
+
+# here is what a random-prefixed refid looks like
+# note the time is the zero value for time.Time
+% reftool parse DxBK5ksxywRfCMUUTIw2mw
+native enc:   1w84nsjb675g8qr8rma4s31pkc
+hex enc:      0f104ae64b31cb045f08c5144c8c369b
+base64 enc:   DxBK5ksxywRfCMUUTIw2mw
+tag value:    4
+type:         RandomPrefixed
+time(string): 1970-01-01T00:00:00Z
+time(millis): 0
 ```
+
 
 [1]: https://github.com/dropwhile/refid/actions
 [2]: https://godoc.org/github.com/dropwhile/refid
