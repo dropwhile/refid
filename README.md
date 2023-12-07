@@ -191,6 +191,50 @@ r, err := AuthorIDT.Parse(authorID.String()) // succeeds; err == nil
 r, err = bookIDT.Parse(authorID.String()) // fails; err != nil
 ```
 
+#### Tagging with Custom Types
+
+A more complicated tagging example using embedded types:
+
+```go
+import (
+    "github.com/dropwhile/refid"
+	"github.com/dropwhile/refid/reftag"
+)
+
+type NoteID struct {
+    // the reftag.IDt* types are generated to provide a handy means to
+    // wrap with your own struct type, to provide type constraints in function
+    // parameters and struct members
+	reftag.IDt8
+}
+
+// some helpful shortcut function aliases
+var (
+    // generate a new time-prefixed refid of tag type 8
+	NewNoteID       = reftag.New[NoteID]
+    // generate a new random-prefixed refid of tag type 8
+	NewRandomNoteID = reftag.NewRandom[NoteID]
+    // handy matcher for sql mock libraries (gomock, pgxmock, etc)
+	NoteIDMatcher   = reftag.NewMatcher[NoteID]()
+    // some handy parsing aliases
+	NoteIDFromBytes = reftag.FromBytes[NoteID]
+	ParseNoteID     = reftag.Parse[NoteID]
+)
+
+func ParseNote(ctx context.Context, db dbHandle, noteStr NoteID) (*NoteID, error) {
+    noteID, err := ParseNoteID(noteStr)
+    // error will be non-nil if the tag in the RefID does not match the expectation (`8`)
+    ...
+    return NoteID, err
+}
+
+func DBLookupNote(ctx context.Context, db dbHandle, noteID NoteID) {
+    // noteID is now a compile time checked type ensuring that RefIDs of a different
+    // tag are not accidentally allowed.
+    ...
+}
+```
+
 ## reftool command like utility
 
 Installation:
