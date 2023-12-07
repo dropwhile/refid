@@ -261,9 +261,9 @@ time(millis): 1695599258954477
 % reftool generate -t 5 -o hex
 060649f82794f10039169e91d0696763
 
-# generate a refid with a tag of 5, and only output the base64 encoding
-% reftool generate -o base64
-BgZJ-i1F2wALdZFJrWvNzA
+# generate a random-prefixed refid with a tag of 4, and only output the base64 encoding
+% reftool generate -r -t 4 -o base64
+DxBK5ksxywRfCMUUTIw2mw
 
 # genrate a refid with a tag of 2, at a specific timestamp
 % reftool generate -t 2 -w "2023-01-01T00:00:11.123456Z"
