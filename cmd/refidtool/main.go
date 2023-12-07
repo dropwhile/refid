@@ -38,7 +38,7 @@ func main() {
 
 	cli := CLI{}
 	ctx := kong.Parse(&cli,
-		kong.Name("reftool"),
+		kong.Name("refidtool"),
 		kong.Description("A tool for working with refids"),
 		kong.UsageOnError(),
 		kong.Vars{

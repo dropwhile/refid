@@ -235,16 +235,16 @@ func DBLookupNote(ctx context.Context, db dbHandle, noteID NoteID) (*DBNote, err
 }
 ```
 
-## reftool CLI utility
+## refidtool CLI utility
 
 Installation:
 ```
-go install github.com/dropwhile/refid/cmd/reftool@latest
+go install github.com/dropwhile/refid/cmd/refidtool@latest
 ```
 
 ```
 # generate a refi.ID with a tag of 5
-% reftool generate -t 5
+% refidtool generate -t 5
 native enc:   0r326xw2xbpga5tya7px89m7hw
 hex enc:      0606237782eaed05175e51edd426878f
 base64 enc:   BgYjd4Lq7QUXXlHt1CaHjw
@@ -254,19 +254,19 @@ time(string): 2023-09-24T23:47:38.954477Z
 time(millis): 1695599258954477
 
 # generate a refid with a tag of 5, and only output the native(base32) encoding
-% reftool generate -t 5 -o native
+% refidtool generate -t 5 -o native
 0r34ky6h51r012an8skhbsvxt0
 
 # generate a refid with a tag of 5, and only output the hex encoding
-% reftool generate -t 5 -o hex
+% refidtool generate -t 5 -o hex
 060649f82794f10039169e91d0696763
 
 # generate a random-prefixed refid with a tag of 4, and only output the base64 encoding
-% reftool generate -r -t 4 -o base64
+% refidtool generate -r -t 4 -o base64
 DxBK5ksxywRfCMUUTIw2mw
 
 # genrate a refid with a tag of 2, at a specific timestamp
-% reftool generate -t 2 -w "2023-01-01T00:00:11.123456Z"
+% refidtool generate -t 2 -w "2023-01-01T00:00:11.123456Z"
 native enc:   0qrjh15pzc004nzrkbpcp2v0wm
 hex enc:      05f12884b6fb000257f89aeccb0b60e5
 base64 enc:   BfEohLb7AAJX-Jrsywtg5Q
@@ -276,7 +276,7 @@ time(string): 2023-01-01T00:00:11.123456Z
 time(millis): 1672531211123456
 
 # decode a refid and display
-% reftool decode 0qrjh15pzc004nzrkbpcp2v0wm
+% refidtool decode 0qrjh15pzc004nzrkbpcp2v0wm
 native enc:   0qrjh15pzc004nzrkbpcp2v0wm
 hex enc:      05f12884b6fb000257f89aeccb0b60e5
 base64 enc:   BfEohLb7AAJX-Jrsywtg5Q
@@ -287,7 +287,7 @@ time(millis): 1672531211123456
 
 # here is what a random-prefixed refid looks like
 # note the time is the zero value for time.Time
-% reftool parse DxBK5ksxywRfCMUUTIw2mw
+% refidtool parse DxBK5ksxywRfCMUUTIw2mw
 native enc:   1w84nsjb675g8qr8rma4s31pkc
 hex enc:      0f104ae64b31cb045f08c5144c8c369b
 base64 enc:   DxBK5ksxywRfCMUUTIw2mw
