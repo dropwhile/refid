@@ -9,7 +9,7 @@ APP_VER             := $(shell git describe --always --tags|sed 's/^v//')
 GITHASH             := $(shell git rev-parse --short HEAD)
 GOPATH              := $(shell go env GOPATH)
 GOBIN               := ${GOPATH}/bin
-VERSION_VAR         := main.ServerVersion
+VERSION_VAR         := main.Version
 
 # flags and build configuration
 GOBUILD_OPTIONS     := -trimpath

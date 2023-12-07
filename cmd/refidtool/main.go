@@ -6,11 +6,14 @@ package main
 
 import (
 	"os"
+	"runtime/debug"
 
 	"github.com/alecthomas/kong"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
+
+var Version string
 
 type verboseFlag bool
 
@@ -18,6 +21,21 @@ func (v verboseFlag) BeforeApply() error {
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	log.Debug().Msg("debug logging enabled")
 	return nil
+}
+
+func GetVersion() string {
+	if len(Version) > 0 {
+		return Version
+	}
+
+	if bi, ok := debug.ReadBuildInfo(); ok {
+		// If no main version is available, Go defaults it to (devel)
+		if bi.Main.Version != "(devel)" {
+			return bi.Main.Version
+		}
+	}
+
+	return "unknown"
 }
 
 type CLI struct {
@@ -42,7 +60,7 @@ func main() {
 		kong.Description("A tool for working with refids"),
 		kong.UsageOnError(),
 		kong.Vars{
-			"version": "1.0.8",
+			"version": GetVersion(),
 		},
 	)
 	err := ctx.Run(&cli)
