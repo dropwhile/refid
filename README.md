@@ -205,20 +205,20 @@ type NoteID struct {
     // the reftag.IDt* types are generated to provide a handy means to
     // wrap with your own struct type, to provide type constraints in function
     // parameters and struct members
-	reftag.IDt8
+    reftag.IDt8
 }
 
 // some helpful shortcut function aliases
 var (
     // generate a new time-prefixed refid of tag type 8
-	NewNoteID       = reftag.New[NoteID]
+    NewNoteID       = reftag.New[NoteID]
     // generate a new random-prefixed refid of tag type 8
-	NewRandomNoteID = reftag.NewRandom[NoteID]
+    NewRandomNoteID = reftag.NewRandom[NoteID]
     // handy matcher for sql mock libraries (gomock, pgxmock, etc)
-	NoteIDMatcher   = reftag.NewMatcher[NoteID]()
+    NoteIDMatcher   = reftag.NewMatcher[NoteID]()
     // some handy parsing aliases
-	NoteIDFromBytes = reftag.FromBytes[NoteID]
-	ParseNoteID     = reftag.Parse[NoteID]
+    NoteIDFromBytes = reftag.FromBytes[NoteID]
+    ParseNoteID     = reftag.Parse[NoteID]
 )
 
 func ParseNote(ctx context.Context, db dbHandle, noteStr NoteID) (*NoteID, error) {
@@ -228,7 +228,7 @@ func ParseNote(ctx context.Context, db dbHandle, noteStr NoteID) (*NoteID, error
     return NoteID, err
 }
 
-func DBLookupNote(ctx context.Context, db dbHandle, noteID NoteID) {
+func DBLookupNote(ctx context.Context, db dbHandle, noteID NoteID) (*DBNote, error) {
     // noteID is now a compile time checked type ensuring that RefIDs of a different
     // tag are not accidentally allowed.
     ...
