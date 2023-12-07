@@ -198,7 +198,7 @@ A more complicated tagging example using embedded types:
 ```go
 import (
     "github.com/dropwhile/refid"
-	"github.com/dropwhile/refid/reftag"
+    "github.com/dropwhile/refid/reftag"
 )
 
 type NoteID struct {
