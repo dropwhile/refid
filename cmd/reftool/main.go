@@ -42,7 +42,7 @@ func main() {
 		kong.Description("A tool for working with refids"),
 		kong.UsageOnError(),
 		kong.Vars{
-			"version": "1.0.6",
+			"version": "1.0.7",
 		},
 	)
 	err := ctx.Run(&cli)
