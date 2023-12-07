@@ -235,7 +235,7 @@ func DBLookupNote(ctx context.Context, db dbHandle, noteID NoteID) (*DBNote, err
 }
 ```
 
-## reftool command like utility
+## reftool CLI utility
 
 Installation:
 ```
