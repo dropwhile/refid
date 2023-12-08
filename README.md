@@ -2,8 +2,8 @@ refid
 =====
 
 [![Build Status](https://github.com/dropwhile/refid/workflows/unit-tests/badge.svg)][1]
-[![GoDoc](https://godoc.org/github.com/dropwhile/refid?status.png)][2]
-[![Go Report Card](https://goreportcard.com/badge/dropwhile/refid)](https://goreportcard.com/report/dropwhile/refid)
+[![GoDoc](https://godoc.org/github.com/dropwhile/refid/v2?status.png)](https://godoc.org/github.com/dropwhile/refid/v2)
+[![Go Report Card](https://goreportcard.com/badge/github.com/dropwhile/refid/v2)](https://goreportcard.com/report/github.com/dropwhile/refid/v2)
 [![License](https://img.shields.io/github/license/dropwhile/refid.svg)](https://github.com/dropwhile/refid/blob/master/LICENSE.md)
 
 ## About
@@ -301,5 +301,4 @@ time(millis): 0
 
 
 [1]: https://github.com/dropwhile/refid/actions
-[2]: https://godoc.org/github.com/dropwhile/refid
 [3]: https://choosealicense.com/licenses/mit/
