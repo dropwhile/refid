@@ -3,7 +3,7 @@ package reftag
 import (
 	"database/sql/driver"
 
-	"github.com/dropwhile/refid"
+	"github.com/dropwhile/refid/v2"
 )
 
 //go:generate go run ../tool/refidgen.go

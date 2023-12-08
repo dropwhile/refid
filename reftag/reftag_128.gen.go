@@ -6,7 +6,7 @@ package reftag
 import (
 	"fmt"
 
-	"github.com/dropwhile/refid"
+	"github.com/dropwhile/refid/v2"
 )
 
 const tagIDt128 = 128

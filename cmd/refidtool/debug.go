@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/dropwhile/refid"
+	"github.com/dropwhile/refid/v2"
 )
 
 func PrintBytes(b []byte) {

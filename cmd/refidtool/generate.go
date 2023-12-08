@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dropwhile/refid"
+	"github.com/dropwhile/refid/v2"
 )
 
 type GenerateCmd struct {

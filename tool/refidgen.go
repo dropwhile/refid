@@ -19,7 +19,7 @@ package {{.Pkg}}
 import (
 	"fmt"
 
-	"github.com/dropwhile/refid"
+	"github.com/dropwhile/refid/v2"
 )
 
 const tagIDt{{.Number}} = {{.Number}}

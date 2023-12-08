@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/dropwhile/refid"
+	"github.com/dropwhile/refid/v2"
 	"gotest.tools/v3/assert"
 )
 
