@@ -4,7 +4,7 @@
 
 package refid
 
-// A Tagger is a conveniece container for encoding and parsing
+// A Tagger is a convenience container for encoding and parsing
 // [ID]'s of a specific tag.
 type Tagger byte
 

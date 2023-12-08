@@ -239,7 +239,7 @@ func (r ID) Bytes() []byte {
 	return b
 }
 
-// String returns the native (base32 w/Crockford alphabet) textual represenation
+// String returns the native (base32 w/Crockford alphabet) textual representation
 // of a [ID]
 func (r ID) String() string {
 	return base32Encoder.EncodeToString(r[:])
@@ -255,12 +255,12 @@ func (r ID) ToBase32String() string {
 	return r.String()
 }
 
-// String returns the base64 textual represenation of a [ID]
+// String returns the base64 textual representation of a [ID]
 func (r ID) ToBase64String() string {
 	return base64.RawURLEncoding.EncodeToString(r[:])
 }
 
-// String returns the base16/hex textual represenation of a [ID]
+// String returns the base16/hex textual representation of a [ID]
 func (r ID) ToHexString() string {
 	return hex.EncodeToString(r[:])
 }
