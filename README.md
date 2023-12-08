@@ -109,7 +109,7 @@ RandomPrefix:
 
 ## Installation
 ```
-go get -u github.com/dropwhile/refid
+go get -u github.com/dropwhile/refid/v2
 ```
 
 ## Usage
@@ -241,7 +241,7 @@ func DBLookupNote(ctx context.Context, db dbHandle, noteID NoteID) (*DBNote, err
 
 Installation:
 ```
-go install github.com/dropwhile/refid/cmd/refidtool@latest
+go install github.com/dropwhile/refid/cmd/refidtool/v2@latest
 ```
 
 ```
