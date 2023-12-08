@@ -199,8 +199,8 @@ A more complicated tagging example using embedded types:
 
 ```go
 import (
-    "github.com/dropwhile/refid"
-    "github.com/dropwhile/refid/reftag"
+    "github.com/dropwhile/refid/v2"
+    "github.com/dropwhile/refid/v2/reftag"
 )
 
 type NoteID struct {
@@ -241,7 +241,7 @@ func DBLookupNote(ctx context.Context, db dbHandle, noteID NoteID) (*DBNote, err
 
 Installation:
 ```
-go install github.com/dropwhile/refid/cmd/refidtool/v2@latest
+go install github.com/dropwhile/refid/v2/cmd/refidtool@latest
 ```
 
 ```
