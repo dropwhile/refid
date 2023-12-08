@@ -19,6 +19,7 @@ var (
 	// ref: https://en.wikipedia.org/wiki/Base32#Crockford's_Base32
 	alphabet      = "0123456789abcdefghjkmnpqrstvwxyz"
 	base32Encoder = base32.NewEncoding(alphabet).WithPadding(base32.NoPadding)
+	maxTime       = int64((1 << 45) - 1)
 	// Nil is the nil ID, that has all 128 bits set to zero.
 	Nil = ID{}
 )
@@ -149,6 +150,10 @@ func (r *ID) SetTime(ts time.Time) error {
 	if r.HasType(RandomPrefixed) {
 		return fmt.Errorf("cant set time of RandomPrefix type")
 	}
+	ms := ts.UTC().UnixMilli()
+	if ms > maxTime {
+		return fmt.Errorf("cant set time that far into the future")
+	}
 	setTime(r[:], ts.UTC().UnixMilli())
 	return nil
 }
@@ -168,6 +173,7 @@ func (r ID) Time() time.Time {
 		(int64(u[3]) << 16) |
 		(int64(u[4]) << 8) |
 		int64(u[5])
+	t = t >> 3
 	return time.UnixMilli(t).UTC()
 }
 

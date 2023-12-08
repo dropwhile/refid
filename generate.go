@@ -16,8 +16,8 @@ func generate(t Type) ([]byte, error) {
 	var err error
 	switch t {
 	case TimePrefixed:
+		err = setRandom(b[typeIndex-1:], rand.Reader)
 		setTime(b, time.Now().UTC().UnixMilli())
-		err = setRandom(b[typeIndex:], rand.Reader)
 		// set type to 0 (clear lowest bit)
 		b[typeIndex] &^= 0x01
 	case RandomPrefixed:
@@ -33,16 +33,18 @@ func generate(t Type) ([]byte, error) {
 }
 
 func setTime(b []byte, millis int64) {
-	ms := uint64(millis)
-	// A 56 bit timestamp of milliseconds since epoch.
-	// Which should result in about 2283 years worth of timestamps
+	// A 45 bit timestamp of milliseconds since epoch.
+	// Which should be fine until around year 3084
 	// 1-7 bytes: big-endian unsigned number of Unix epoch timestamp
+	ms := uint64(millis) << 3
 	b[0] = byte(ms >> 40)
 	b[1] = byte(ms >> 32)
 	b[2] = byte(ms >> 24)
 	b[3] = byte(ms >> 16)
 	b[4] = byte(ms >> 8)
-	b[5] = byte(ms)
+	// clear all but the bottom 3 bits of b[5],
+	// as that is random data we want to leave as radom
+	b[5] = byte(ms) | (b[5] & 0b111)
 }
 
 // use cyrpto/rand for non-test code

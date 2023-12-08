@@ -17,8 +17,8 @@ import (
 
 var (
 	refTagTest     = byte(1)
-	testValWoutTag = "065f5e3p0gk013cvyvm171gn9m"
-	testValWithTag = "065f5ef3q4k03p495rqw0g92sr"
+	testValWoutTag = "1hh39ed2w3n01fwsmk9w4d4x44"
+	testValWithTag = "1hh39ed2w3n03fwsmk9w4d4x44"
 )
 
 func TestParseVarious(t *testing.T) {
@@ -63,7 +63,7 @@ func TestParseVarious(t *testing.T) {
 	_, err = Parse("!!!!!!!!!!!!!!!!!!!!!!!!!!")
 	assert.Assert(t, err != nil, "expected to fail parsing invalid refid")
 
-	maxTime := time.UnixMilli(281474976710655)
+	maxTime := time.UnixMilli(35184372088831)
 	minTime := time.UnixMilli(0)
 
 	// max value with type set to TimePrefixed
@@ -129,7 +129,8 @@ func TestGetTime(t *testing.T) {
 	assert.Equal(t, t0, vz)
 
 	r2 := Must(Parse(testValWoutTag))
-	ts, _ := time.Parse(time.RFC3339, "2023-10-02T23:28:09.732Z")
+	fmt.Println(r2.Time())
+	ts, _ := time.Parse(time.RFC3339, "2023-12-07T23:22:43.676Z")
 	assert.Equal(t, ts.UTC(), r2.Time().UTC())
 }
 
@@ -142,9 +143,14 @@ func TestSetTime(t *testing.T) {
 	r.SetTime(ts)
 	assert.Equal(t, ts.UTC(), r.Time().UTC())
 
+	// try to set a time too far into the future
+	err := r.SetTime(time.UnixMilli(maxTime + 1))
+	fmt.Printf("ERRRR: %s\n", err)
+	assert.Assert(t, err != nil, "expected to error")
+
 	r = Must(NewRandom())
 	// should error with random type
-	err := r.SetTime(ts)
+	err = r.SetTime(ts)
 	assert.Assert(t, err != nil, "expected to error")
 	assert.Assert(t, r.Time().Equal(time.UnixMilli(0)))
 }
@@ -206,8 +212,8 @@ func TestSetTag(t *testing.T) {
 
 	r.SetTag(refTagTest)
 	assert.Check(t, r.HasTag(refTagTest))
-	assert.Equal(t, r.String(), "065f5e3p0gk033cvyvm171gn9m")
-	assert.Equal(t, (&r).String(), "065f5e3p0gk033cvyvm171gn9m")
+	assert.Equal(t, r.String(), testValWithTag)
+	assert.Equal(t, (&r).String(), testValWithTag)
 
 	r.ClearTag()
 	assert.Check(t, !r.HasTag(refTagTest))
@@ -216,11 +222,11 @@ func TestSetTag(t *testing.T) {
 
 	r2 := Must(Parse(testValWoutTag))
 	r2.SetTag(1)
-	assert.Equal(t, r2.ToHexString(), "018af2b8760426018d9bf6e81386154d")
+	assert.Equal(t, r2.ToHexString(), "0c6234b9a2e0ea01bf99a4d3c2349d21")
 	r2.ClearTag()
-	assert.Equal(t, r2.ToHexString(), "018af2b8760426008d9bf6e81386154d")
+	assert.Equal(t, r2.ToHexString(), "0c6234b9a2e0ea00bf99a4d3c2349d21")
 	r2.SetTag(2)
-	assert.Equal(t, r2.ToHexString(), "018af2b8760426028d9bf6e81386154d")
+	assert.Equal(t, r2.ToHexString(), "0c6234b9a2e0ea02bf99a4d3c2349d21")
 }
 
 func TestAmbiguous(t *testing.T) {

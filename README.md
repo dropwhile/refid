@@ -9,9 +9,12 @@ refid
 ## About
 
 A refid (short for Reference Identifier) is a unique identifier,
-similar to UUIDv7, with a few difference.
+similar to a UUID, with some differences.
 
-There are two types of refids: TimePrefixed and RandomPrefixed.
+There are two types of refids:
+
+*   TimePrefixed - similar to UUIDv7
+*   RandomPrefixed - similar to UUIDv4
 
 ### TimePrefixed (type:0x00)
 
@@ -21,17 +24,17 @@ There are two types of refids: TimePrefixed and RandomPrefixed.
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                           unix_ts_ms                          |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|           unix_ts_ms          |    rand_a   |t|      tag      |
+|        unix_ts_ms       |       rand_a      |t|      tag      |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                             rand_b                            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                             rand_b                            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 unix_ts_ms:
-    48 bits big-endian unsigned number of Unix epoch timestamp milliseconds.
-    (2284 years worth... until about year 4200 or so)
+    45 bits big-endian unsigned number of Unix epoch timestamp milliseconds.
+    (over 2000 years worth... until about year 3084 or so)
 rand_a:
-    7 bits random pad. fill with crypto/rand random.
+    10 bits random pad. fill with crypto/rand random.
 t:
     1 bit for type. TimePrefixed (type:0)
 tag:
@@ -70,24 +73,23 @@ General:
 *   tagging (support for 255 distinct tags)
 *   supports go/sql scanner/valuer
 *   multiple encodings supported: native (base32), base64, base16 (hex)
-*   similar to UUIDv7, with different tradeoffs
 
 TimePrefix:
 *   unix timestamp with millisecond precision
 *   sortable, db index friendly
 *   Compared to UUIDv7
     *   tagging support
-    *   48 bits of Unix timestamp milliseconds from epoch (similar to UUIDv7)
-    *   slightly smaller random section (71 vs 74 bits), though still good
-        collision resistance
+    *   slightly smaller Unix timestamp (45 vs 48 bits), though still
+        enough bits until about year 3084
+    *   same size random pad section (74 bits)
     *   not a standard
 
 RandomPrefix:
 *   not sortable, not db index friendly
-*   Compared to UUIDv7
+*   Compared to UUIDv4
     *   tagging support
-    *   slightly smaller random section (119 vs 122 bits), though still good
-        collision resistance
+    *   slightly smaller random section (119 vs 122 bits), though still
+        good collision resistance
     *   not a standard
 
 ## Non-Features
