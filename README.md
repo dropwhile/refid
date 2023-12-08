@@ -125,11 +125,11 @@ rID = refid.Must(refid.NewRandom())
 
 // encoding...
 // encode to native encoding (base32 with Crockford alphabet)
-s := rID.String() // "0r326xw2xbpga5tya7px89m7hw"
+s := rID.String() // "1hh3eb5563000h8ab7mbsq1gq0"
 // encode to base64 encoding
-s = rID.ToBase64String() // "BgYjd4Lq7QUXXlHt1CaHjw"
+s = rID.ToBase64String() // "DGI3LKUwwABFClnovNwwuA"
 // encode to hex encoding
-s = rID.ToHexString() // "0606237782eaed05175e51edd426878f"
+s = rID.ToHexString() // "0c62372ca530c000450a59e8bcdc30b8"
 // raw bytes
 b := rID.Bytes()
 
@@ -247,53 +247,53 @@ go install github.com/dropwhile/refid/v2/cmd/refidtool@latest
 ```
 # generate a refi.ID with a tag of 5
 % refidtool generate -t 5
-native enc:   0r326xw2xbpga5tya7px89m7hw
-hex enc:      0606237782eaed05175e51edd426878f
-base64 enc:   BgYjd4Lq7QUXXlHt1CaHjw
+native enc:   1hh3ecgwmg40ahtaf41qc1dz88
+hex enc:      0c6237321ca40805474a79037605bf42
+base64 enc:   DGI3MhykCAVHSnkDdgW_Qg
 tag value:    5
 type:         TimePrefixed
-time(string): 2023-09-24T23:47:38.954477Z
-time(millis): 1695599258954477
+time(string): 2023-12-08T00:49:04.916Z
+time(millis): 1701996544916
 
 # generate a refid with a tag of 5, and only output the native(base32) encoding
 % refidtool generate -t 5 -o native
-0r34ky6h51r012an8skhbsvxt0
+1hh3ecvn3dt0bs66r6p6q4gqe0
 
 # generate a refid with a tag of 5, and only output the hex encoding
 % refidtool generate -t 5 -o hex
-060649f82794f10039169e91d0696763
+0c6237347678a60554f8b73f96992fed
 
 # generate a random-prefixed refid with a tag of 4, and only output the base64 encoding
 % refidtool generate -r -t 4 -o base64
-DxBK5ksxywRfCMUUTIw2mw
+KRUV6EEACQRsivT1_pNr4w
 
 # genrate a refid with a tag of 2, at a specific timestamp
 % refidtool generate -t 2 -w "2023-01-01T00:00:11.123456Z"
-native enc:   0qrjh15pzc004nzrkbpcp2v0wm
-hex enc:      05f12884b6fb000257f89aeccb0b60e5
-base64 enc:   BfEohLb7AAJX-Jrsywtg5Q
+native enc:   1gnna1wvkbx047v48dhxeh7c5g
+hex enc:      0c2b55079b9afa021f644363d744ec2c
+base64 enc:   DCtVB5ua-gIfZENj10TsLA
 tag value:    2
 type:         TimePrefixed
-time(string): 2023-01-01T00:00:11.123456Z
-time(millis): 1672531211123456
+time(string): 2023-01-01T00:00:11.123Z
+time(millis): 1672531211123
 
 # decode a refid and display
-% refidtool decode 0qrjh15pzc004nzrkbpcp2v0wm
-native enc:   0qrjh15pzc004nzrkbpcp2v0wm
-hex enc:      05f12884b6fb000257f89aeccb0b60e5
-base64 enc:   BfEohLb7AAJX-Jrsywtg5Q
+% refidtool parse 1hh3eehsh2p05ycz44y9erhvhm
+native enc:   1hh3eehsh2p05ycz44y9erhvhm
+hex enc:      0c62373a3988ac02f99f213c97623b8d
+base64 enc:   DGI3OjmIrAL5nyE8l2I7jQ
 tag value:    2
 type:         TimePrefixed
-time(string): 2023-01-01T00:00:11.123456Z
-time(millis): 1672531211123456
+time(string): 2023-12-08T00:50:11.377Z
+time(millis): 1701996611377
 
 # here is what a random-prefixed refid looks like
 # note the time is the zero value for time.Time
-% refidtool parse DxBK5ksxywRfCMUUTIw2mw
-native enc:   1w84nsjb675g8qr8rma4s31pkc
-hex enc:      0f104ae64b31cb045f08c5144c8c369b
-base64 enc:   DxBK5ksxywRfCMUUTIw2mw
-tag value:    4
+% refidtool parse 8xqzbn495crg5mxjztjczfk0xr
+native enc:   8xqzbn495crg5mxjztjczfk0xr
+hex enc:      476ff5d4892b3102d3b2fea4cfbe60ee
+base64 enc:   R2_11IkrMQLTsv6kz75g7g
+tag value:    2
 type:         RandomPrefixed
 time(string): 1970-01-01T00:00:00Z
 time(millis): 0
