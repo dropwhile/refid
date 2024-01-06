@@ -223,7 +223,7 @@ var (
     ParseNoteID     = reftag.Parse[NoteID]
 )
 
-func ParseNote(ctx context.Context, db dbHandle, noteStr NoteID) (*NoteID, error) {
+func ParseNote(ctx context.Context, db dbHandle, noteStr string) (*NoteID, error) {
     noteID, err := ParseNoteID(noteStr)
     // error will be non-nil if the tag in the RefID does not match the expectation (`8`)
     ...
