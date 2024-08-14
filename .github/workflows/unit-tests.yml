@@ -5,6 +5,11 @@ on:
   pull_request:
     branches: [main]
 
+# ensure testing on actual specified versions, and not auto-upgraded toolchain
+# versions
+env:
+  GOTOOLCHAIN: local
+
 jobs:
   build:
     name: Build

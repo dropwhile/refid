@@ -9,6 +9,11 @@ on:
   schedule:
     - cron: '40 1 * * 2'
 
+# ensure testing on actual specified versions, and not auto-upgraded toolchain
+# versions
+env:
+  GOTOOLCHAIN: local
+
 jobs:
   analyse:
     name: Analyse
