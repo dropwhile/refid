@@ -36,7 +36,12 @@ func setTime(b []byte, millis int64) {
 	// A 45 bit timestamp of milliseconds since epoch.
 	// Which should be fine until around year 3084
 	// 1-7 bytes: big-endian unsigned number of Unix epoch timestamp
-	ms := uint64(millis) << 3
+	if millis < 0 {
+		millis = 0
+	} else if millis > maxTime {
+		millis = maxTime
+	}
+	ms := uint64(millis) << 3 // #nosec G115 - guarded above and in callers
 	b[0] = byte(ms >> 40)
 	b[1] = byte(ms >> 32)
 	b[2] = byte(ms >> 24)

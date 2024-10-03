@@ -151,7 +151,9 @@ func (r *ID) SetTime(ts time.Time) error {
 		return fmt.Errorf("cant set time of RandomPrefix type")
 	}
 	ms := ts.UTC().UnixMilli()
-	if ms > maxTime {
+	if ms < 0 {
+		return fmt.Errorf("cant set time that far into the past")
+	} else if ms > maxTime {
 		return fmt.Errorf("cant set time that far into the future")
 	}
 	setTime(r[:], ts.UTC().UnixMilli())
