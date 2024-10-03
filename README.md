@@ -134,12 +134,8 @@ s = rID.ToHexString() // "0c62372ca530c000450a59e8bcdc30b8"
 b := rID.Bytes()
 
 // decoding...
-// decode from native
+// decode from native/base32, base64, or base16/hex
 rID, err := refid.Parse(s)
-// decode from base64
-rID, err = refid.FromBase64String(s)
-// decode from hex
-rID, err = refid.FromHexString(s)
 
 // get the time out of a TimePrefixed refid (as a time.Time)
 var ts time.Time = rID.Time()
