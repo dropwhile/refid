@@ -40,7 +40,8 @@ var (
 func TestSQL(t *testing.T) {
 	t.Run("Value", testSQLValue)
 	t.Run("Scan", func(t *testing.T) {
-		t.Run("Binary", testSQLScanBinary)
+		t.Run("BinarySlice", testSQLScanBinarySlice)
+		t.Run("BinaryArray", testSQLScanBinaryArray)
 		t.Run("String", testSQLScanString)
 		t.Run("Text", testSQLScanText)
 		t.Run("Unsupported", testSQLScanUnsupported)
@@ -65,9 +66,20 @@ func testSQLValue(t *testing.T) {
 	)
 }
 
-func testSQLScanBinary(t *testing.T) {
+func testSQLScanBinarySlice(t *testing.T) {
 	got := ID{}
 	err := got.Scan(codecTestData)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !got.Equal(codecTestID) {
+		t.Errorf("Scan(%x): got %v, want %v", codecTestData, got, codecTestID)
+	}
+}
+
+func testSQLScanBinaryArray(t *testing.T) {
+	got := ID{}
+	err := got.Scan([16]byte(codecTestData))
 	if err != nil {
 		t.Fatal(err)
 	}

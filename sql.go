@@ -57,6 +57,8 @@ func (r *ID) Scan(src interface{}) error {
 			return r.UnmarshalBinary(src)
 		}
 		return r.UnmarshalText(src)
+	case [16]byte:
+		return r.UnmarshalBinary(src[:])
 	case string:
 		switch len(src) {
 		case 26, 32, 22:
