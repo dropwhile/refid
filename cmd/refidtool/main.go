@@ -5,23 +5,13 @@
 package main
 
 import (
-	"os"
+	"log/slog"
 	"runtime/debug"
 
 	"github.com/alecthomas/kong"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 )
 
 var Version string
-
-type verboseFlag bool
-
-func (v verboseFlag) BeforeApply() error {
-	zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	log.Debug().Msg("debug logging enabled")
-	return nil
-}
 
 func GetVersion() string {
 	if len(Version) > 0 {
@@ -40,7 +30,7 @@ func GetVersion() string {
 
 type CLI struct {
 	// global options
-	Verbose verboseFlag      `name:"verbose" short:"v" help:"enable verbose logging"`
+	Verbose bool             `name:"verbose" short:"v" help:"enable verbose logging"`
 	Version kong.VersionFlag `name:"version" short:"V" help:"Print version information and quit"`
 
 	// subcommands
@@ -49,11 +39,6 @@ type CLI struct {
 }
 
 func main() {
-	log.Logger = log.Output(zerolog.ConsoleWriter{
-		Out:          os.Stderr,
-		PartsExclude: []string{zerolog.TimestampFieldName},
-	})
-
 	cli := CLI{}
 	ctx := kong.Parse(&cli,
 		kong.Name("refidtool"),
@@ -63,6 +48,9 @@ func main() {
 			"version": GetVersion(),
 		},
 	)
+	if cli.Verbose {
+		logLevel.Set(slog.LevelDebug)
+	}
 	err := ctx.Run(&cli)
 	ctx.FatalIfErrorf(err)
 }

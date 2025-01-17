@@ -6,7 +6,6 @@ package main
 
 import (
 	"github.com/dropwhile/refid/v2"
-	"github.com/rs/zerolog/log"
 )
 
 type DecodeCmd struct {
@@ -18,12 +17,12 @@ func (cmd *DecodeCmd) Run() error {
 	case 26, 32, 22:
 		// ok
 	default:
-		log.Fatal().Msg("invalid refid argument length")
+		Fatal("invalid refid argument length")
 	}
 
 	xID, err := refid.Parse(cmd.RefID)
 	if err != nil {
-		log.Fatal().Err(err).Msg("error parsing refid")
+		Fatalf("error parsing refid: %s", err)
 	}
 
 	PrintRefID(xID)
