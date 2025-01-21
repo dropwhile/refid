@@ -28,13 +28,7 @@ CC_OUTPUT_TPL       := ${BUILDDIR}/bin/{{.Dir}}.{{.OS}}-{{.Arch}}
 DOCKER_PREBUILD     ?=
 
 # some exported vars (pre-configure go build behavior)
-export GO111MODULE=on
 #export CGO_ENABLED=0
-## enable go 1.21 loopvar "experiment"
-export GOEXPERIMENT=loopvar
-export GOOSE_DRIVER
-export GOOSE_DBSTRING
-export GOOSE_MIGRATION_DIR
 export GOBIN
 export PATH := ${GOBIN}:${PATH}
 

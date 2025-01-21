@@ -1,6 +1,6 @@
 module github.com/dropwhile/refid/v2
 
-go 1.21
+go 1.22
 
 require (
 	github.com/alecthomas/kong v1.6.1
