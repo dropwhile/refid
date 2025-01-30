@@ -3,7 +3,7 @@ module github.com/dropwhile/refid/v2
 go 1.22
 
 require (
-	github.com/alecthomas/kong v1.6.1
+	github.com/alecthomas/kong v1.7.0
 	gotest.tools/v3 v3.5.1
 )
 
