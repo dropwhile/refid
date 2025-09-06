@@ -237,7 +237,7 @@ func DBLookupNote(ctx context.Context, db dbHandle, noteID NoteID) (*DBNote, err
 
 Installation:
 ```
-go install github.com/dropwhile/refid/v2/cmd/refidtool@latest
+go install github.com/dropwhile/refidtool/v2@latest
 ```
 
 ```
