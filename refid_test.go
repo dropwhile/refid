@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"gotest.tools/v3/assert"
+	"github.com/dropwhile/assert"
 )
 
 var (
@@ -25,79 +25,79 @@ func TestParseVarious(t *testing.T) {
 	//// time prefix types
 	// no tag
 	_, err := Parse("065f5e3p0gk013cvyvm171gn9m")
-	assert.NilError(t, err)
+	assert.Nil(t, err)
 	_, err = Parse("018af2b8760426008d9bf6e81386154d")
-	assert.NilError(t, err)
+	assert.Nil(t, err)
 	_, err = Parse("AYryuHYEJgCNm_boE4YVTQ")
-	assert.NilError(t, err)
+	assert.Nil(t, err)
 	// with tag
 	_, err = Parse("065f5ef3q4k03p495rqw0g92sr")
-	assert.NilError(t, err)
+	assert.Nil(t, err)
 	_, err = Parse("018af2b9e3b92601d8892e2fc04122ce")
-	assert.NilError(t, err)
+	assert.Nil(t, err)
 	_, err = Parse("AYryueO5JgHYiS4vwEEizg")
-	assert.NilError(t, err)
+	assert.Nil(t, err)
 	//// random time prefix types
 	// no tag
 	_, err = Parse("sqpwgp85q3sg1jftqhyefasemc")
-	assert.NilError(t, err)
+	assert.Nil(t, err)
 	_, err = Parse("cdedc85905b8f300c9fabc7ce7ab2ea3")
-	assert.NilError(t, err)
+	assert.Nil(t, err)
 	_, err = Parse("ze3IWQW48wDJ-rx856suow")
-	assert.NilError(t, err)
+	assert.Nil(t, err)
 	// with tag
 	_, err = Parse("e02ddgb2zkyg3rmeza7jvwnn6g")
-	assert.NilError(t, err)
+	assert.Nil(t, err)
 	_, err = Parse("7004d6c162fcfd01e28efa8f2df2b534")
-	assert.NilError(t, err)
+	assert.Nil(t, err)
 	_, err = Parse("cATWwWL8_QHijvqPLfK1NA")
-	assert.NilError(t, err)
+	assert.Nil(t, err)
 
 	// bad ones
 	_, err = Parse("nope")
-	assert.Assert(t, err != nil, "expected to fail parsing invalid refid")
+	assert.NotNil(t, err, "expected to fail parsing invalid refid")
 	_, err = Parse("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz")
-	assert.Assert(t, err != nil, "expected to fail parsing invalid refid")
+	assert.NotNil(t, err, "expected to fail parsing invalid refid")
 	_, err = Parse("!!!!!!!!!!!!!!!!!!!!!!")
-	assert.Assert(t, err != nil, "expected to fail parsing invalid refid")
+	assert.NotNil(t, err, "expected to fail parsing invalid refid")
 	_, err = Parse("!!!!!!!!!!!!!!!!!!!!!!!!!!")
-	assert.Assert(t, err != nil, "expected to fail parsing invalid refid")
+	assert.NotNil(t, err, "expected to fail parsing invalid refid")
 
 	maxTime := time.UnixMilli(35184372088831)
 	minTime := time.UnixMilli(0)
 
 	// max value with type set to TimePrefixed
 	x, err := Parse("zzzzzzzzzzzfzzzzzzzzzzzzzw")
-	assert.NilError(t, err)
-	assert.Assert(t, x.Tag() == 0xff)
-	assert.Assert(t, x.Time().Equal(maxTime))
+	assert.Nil(t, err)
+	assert.True(t, x.Tag() == 0xff)
+	assert.True(t, x.Time().Equal(maxTime))
 
 	// max value with type set to RandomPrefixed
 	x, err = Parse("zzzzzzzzzzzzzzzzzzzzzzzzzw")
-	assert.NilError(t, err)
-	assert.Assert(t, x.Tag() == 0xff)
-	assert.Assert(t, x.Time().Equal(minTime))
+	assert.Nil(t, err)
+	assert.True(t, x.Tag() == 0xff)
+	assert.True(t, x.Time().Equal(minTime))
 
 	// base32 padding at the end, so >w is truncated to w
 	// TimePrefixed
 	x, err = Parse("zzzzzzzzzzzfzzzzzzzzzzzzzz")
-	assert.NilError(t, err)
-	assert.Assert(t, x.Tag() == 0xff)
-	assert.Assert(t, x.Time().Equal(maxTime))
+	assert.Nil(t, err)
+	assert.True(t, x.Tag() == 0xff)
+	assert.True(t, x.Time().Equal(maxTime))
 
 	// base32 padding at the end, so >w is truncated to w
 	// RandomPrefixed
 	x, err = Parse("zzzzzzzzzzzzzzzzzzzzzzzzzz")
-	assert.NilError(t, err)
-	assert.Assert(t, x.Tag() == 0xff)
+	assert.Nil(t, err)
+	assert.True(t, x.Tag() == 0xff)
 	// RandomPrefixed has zero time value
-	assert.Assert(t, x.Time().Equal(minTime))
+	assert.True(t, x.Time().Equal(minTime))
 
 	// min value with type set to TimePrefixed
 	x, err = Parse("00000000000000000000000000")
-	assert.NilError(t, err)
-	assert.Assert(t, x.Tag() == 0x00)
-	assert.Assert(t, x.Time().Equal(minTime))
+	assert.Nil(t, err)
+	assert.True(t, x.Tag() == 0x00)
+	assert.True(t, x.Time().Equal(minTime))
 
 	val_max := [16]byte{}
 	val_min := [16]byte{}
@@ -107,16 +107,16 @@ func TestParseVarious(t *testing.T) {
 	}
 
 	x, err = FromBytes(val_max[:])
-	assert.NilError(t, err)
-	assert.Assert(t, x.Tag() == 0xff)
-	assert.Assert(t, x.Type() == RandomPrefixed)
-	assert.Assert(t, x.Time().Equal(minTime))
+	assert.Nil(t, err)
+	assert.True(t, x.Tag() == 0xff)
+	assert.True(t, x.Type() == RandomPrefixed)
+	assert.True(t, x.Time().Equal(minTime))
 
 	x, err = FromBytes(val_min[:])
-	assert.NilError(t, err)
-	assert.Assert(t, x.Tag() == 0x00)
-	assert.Assert(t, x.Type() == TimePrefixed)
-	assert.Assert(t, x.Time().Equal(minTime))
+	assert.Nil(t, err)
+	assert.True(t, x.Tag() == 0x00)
+	assert.True(t, x.Type() == TimePrefixed)
+	assert.True(t, x.Time().Equal(minTime))
 }
 
 func TestGetTime(t *testing.T) {
@@ -146,13 +146,13 @@ func TestSetTime(t *testing.T) {
 	// try to set a time too far into the future
 	err := r.SetTime(time.UnixMilli(maxTime + 1))
 	fmt.Printf("ERRRR: %s\n", err)
-	assert.Assert(t, err != nil, "expected to error")
+	assert.NotNil(t, err, "expected to error")
 
 	r = Must(NewRandom())
 	// should error with random type
 	err = r.SetTime(ts)
-	assert.Assert(t, err != nil, "expected to error")
-	assert.Assert(t, r.Time().Equal(time.UnixMilli(0)))
+	assert.NotNil(t, err, "expected to error")
+	assert.True(t, r.Time().Equal(time.UnixMilli(0)))
 }
 
 func TestBase64RoundTrip(t *testing.T) {
@@ -161,7 +161,7 @@ func TestBase64RoundTrip(t *testing.T) {
 	r := Must(Parse(testValWithTag))
 	b64 := r.ToBase64String()
 	r2, err := Parse(b64)
-	assert.NilError(t, err)
+	assert.Nil(t, err)
 	assert.Equal(t, r.String(), r2.String())
 }
 
@@ -171,7 +171,7 @@ func TestHexRoundTrip(t *testing.T) {
 	r := Must(Parse(testValWithTag))
 	b64 := r.ToHexString()
 	r2, err := Parse(b64)
-	assert.NilError(t, err)
+	assert.Nil(t, err)
 	assert.Equal(t, r.String(), r2.String())
 }
 
@@ -179,26 +179,26 @@ func TestRoundTrip(t *testing.T) {
 	t.Parallel()
 	u := Must(New())
 	r := Must(Parse(u.String()))
-	assert.Check(t, !u.HasTag(refTagTest))
-	assert.Check(t, !r.HasTag(refTagTest))
+	assert.False(t, u.HasTag(refTagTest))
+	assert.False(t, r.HasTag(refTagTest))
 	assert.Equal(t, u.String(), r.String())
 
 	u = Must(NewTagged(refTagTest))
 	r = Must(Parse(u.String()))
-	assert.Check(t, u.HasTag(refTagTest))
-	assert.Check(t, r.HasTag(refTagTest))
+	assert.True(t, u.HasTag(refTagTest))
+	assert.True(t, r.HasTag(refTagTest))
 	assert.Equal(t, u.String(), r.String())
 
 	u = Must(NewRandom())
 	r = Must(Parse(u.String()))
-	assert.Check(t, !u.HasTag(refTagTest))
-	assert.Check(t, !r.HasTag(refTagTest))
+	assert.False(t, u.HasTag(refTagTest))
+	assert.False(t, r.HasTag(refTagTest))
 	assert.Equal(t, u.String(), r.String())
 
 	u = Must(NewRandomTagged(refTagTest))
 	r = Must(Parse(u.String()))
-	assert.Check(t, u.HasTag(refTagTest))
-	assert.Check(t, r.HasTag(refTagTest))
+	assert.True(t, u.HasTag(refTagTest))
+	assert.True(t, r.HasTag(refTagTest))
 	assert.Equal(t, u.String(), r.String())
 }
 
@@ -206,17 +206,17 @@ func TestSetTag(t *testing.T) {
 	t.Parallel()
 
 	r := Must(Parse(testValWoutTag))
-	assert.Check(t, !r.HasTag(refTagTest))
+	assert.False(t, r.HasTag(refTagTest))
 	assert.Equal(t, r.String(), testValWoutTag)
 	assert.Equal(t, (&r).String(), testValWoutTag)
 
 	r.SetTag(refTagTest)
-	assert.Check(t, r.HasTag(refTagTest))
+	assert.True(t, r.HasTag(refTagTest))
 	assert.Equal(t, r.String(), testValWithTag)
 	assert.Equal(t, (&r).String(), testValWithTag)
 
 	r.ClearTag()
-	assert.Check(t, !r.HasTag(refTagTest))
+	assert.False(t, r.HasTag(refTagTest))
 	assert.Equal(t, r.String(), testValWoutTag)
 	assert.Equal(t, (&r).String(), testValWoutTag)
 
@@ -235,8 +235,8 @@ func TestAmbiguous(t *testing.T) {
 	rd0 := Must(Parse(testValWoutTag))
 	rd1 := Must(Parse(testValWoutTag))
 	rd2 := Must(Parse(testValWoutTag))
-	assert.Assert(t, rd0.String() == rd1.String() && rd1.String() == rd2.String())
-	assert.Assert(t, rd0.Equal(rd1) && rd1.Equal(rd2))
+	assert.True(t, rd0.String() == rd1.String() && rd1.String() == rd2.String())
+	assert.True(t, rd0.Equal(rd1) && rd1.Equal(rd2))
 }
 
 func TestTemplateStringer(t *testing.T) {
@@ -246,7 +246,7 @@ func TestTemplateStringer(t *testing.T) {
 	tpl := template.Must(template.New("name").Parse(`{{.}}`))
 	var b bytes.Buffer
 	err := tpl.Execute(&b, s)
-	assert.NilError(t, err)
+	assert.Nil(t, err)
 	assert.Equal(t, b.String(), testValWoutTag)
 }
 
@@ -255,7 +255,7 @@ func TestJsonMarshal(t *testing.T) {
 
 	s := Must(Parse(testValWoutTag))
 	j, err := json.Marshal(s)
-	assert.NilError(t, err)
+	assert.Nil(t, err)
 	assert.Equal(t, string(j), fmt.Sprintf("%q", s.String()))
 }
 
@@ -265,6 +265,6 @@ func TestJsonUnmarshal(t *testing.T) {
 	data := fmt.Sprintf("%q", testValWoutTag)
 	var r ID
 	err := json.Unmarshal([]byte(data), &r)
-	assert.NilError(t, err)
+	assert.Nil(t, err)
 	assert.Equal(t, r.String(), testValWoutTag)
 }

@@ -26,10 +26,10 @@ package refid
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 
-	"gotest.tools/v3/assert"
-	"gotest.tools/v3/assert/cmp"
+	"github.com/dropwhile/assert"
 )
 
 var (
@@ -59,11 +59,7 @@ func testSQLValue(t *testing.T) {
 		t.Fatalf("Value() returned %T, want []byte", v)
 	}
 	want := codecTestID.Bytes()
-	assert.Assert(
-		t, cmp.DeepEqual(got, want),
-		"Vlaue() == %q, want %q",
-		got, want,
-	)
+	assert.Equal(t, got, want)
 }
 
 func testSQLScanBinarySlice(t *testing.T) {
@@ -185,10 +181,7 @@ func testNullIDValueValid(t *testing.T) {
 		t.Errorf("Value() returned %T, want []byte", got)
 	}
 	want := codecTestID.Bytes()
-	assert.Assert(
-		t, cmp.DeepEqual(s, want),
-		"%v.Value() == %s, want %s", nu, s, want,
-	)
+	assert.Equal(t, s, want)
 }
 
 func testNullIDScanNil(t *testing.T) {
@@ -242,9 +235,12 @@ func testNullIDMarshalJSONNil(t *testing.T) {
 		t.Fatalf("(%#v).MarshalJSON err want: <nil>, got: %v", u, err)
 	}
 
-	assert.Assert(
-		t, cmp.DeepEqual(`"`+Nil.String()+`"`, string(data)),
-		"(%#v).MarshalJSON value want: %s, got: %s", u, Nil.Bytes(), data,
+	assert.Equal(
+		t, `"`+Nil.String()+`"`, string(data),
+		fmt.Sprintf(
+			"(%#v).MarshalJSON value want: %s, got: %s",
+			u, Nil.Bytes(), data,
+		),
 	)
 }
 
@@ -259,9 +255,12 @@ func testNullIDMarshalJSONValid(t *testing.T) {
 		t.Fatalf("(%#v).MarshalJSON err want: <nil>, got: %v", u, err)
 	}
 
-	assert.Assert(
-		t, cmp.DeepEqual(`"`+codecTestID.String()+`"`, string(data)),
-		"(%#v).MarshalJSON value want: %s, got: %s", u, codecTestID.Bytes(), data,
+	assert.Equal(
+		t, `"`+codecTestID.String()+`"`, string(data),
+		fmt.Sprintf(
+			"(%#v).MarshalJSON value want: %s, got: %s",
+			u, codecTestID.Bytes(), data,
+		),
 	)
 }
 
