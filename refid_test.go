@@ -268,3 +268,42 @@ func TestJsonUnmarshal(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, r.String(), testValWoutTag)
 }
+
+func FuzzJsonMarshalUnmarshal(f *testing.F) {
+	f.Add(Must(New()).ToHexString())
+	f.Add(Must(New()).ToBase32String())
+	f.Add(Must(New()).ToBase64String())
+	f.Add(Must(NewTagged(1)).ToHexString())
+	f.Add(Must(NewTagged(1)).ToBase32String())
+	f.Add(Must(NewTagged(1)).ToBase64String())
+	f.Add(Must(NewRandom()).ToHexString())
+	f.Add(Must(NewRandom()).ToBase32String())
+	f.Add(Must(NewRandom()).ToBase64String())
+	f.Add(Must(NewRandomTagged(1)).ToHexString())
+	f.Add(Must(NewRandomTagged(1)).ToBase32String())
+	f.Add(Must(NewRandomTagged(1)).ToBase64String())
+
+	f.Fuzz(func(t *testing.T, input string) {
+		p, err := Parse(input)
+		if err != nil {
+			t.Skip()
+		}
+
+		j, err := json.Marshal(p)
+		if err != nil {
+			t.Fatalf("failed marshal json value: %q", input)
+		}
+
+		var r ID
+		if err := json.Unmarshal(j, &r); err != nil {
+			t.Fatalf("failed to unmarshal json: %q => %q", input, string(j))
+		}
+
+		if !p.Equal(r) {
+			t.Fatalf("bytes were not equal: %v != %v", p.Bytes(), r.Bytes())
+		}
+		if p.String() != r.String() {
+			t.Fatalf("strings were not equal: %q != %q", p.String(), r.String())
+		}
+	})
+}
